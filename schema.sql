@@ -72,6 +72,7 @@ create table Customer (
     Frequent_Miles varchar(5),
     constraint Customer_PK primary key (CID),
     constraint Customer_Salutation_Check check (Salutation in ('Mr', 'Mrs', 'Ms'))
+    -- Gotta figure out how the Frequent_Miles thing works
 );
 
 create table Reservation (
@@ -83,4 +84,19 @@ create table Reservation (
     Ticketed varchar(1),
     constraint Reservation_PK primary key (Reservation_Number),
     constraint Reservation_CID_FK foreign key (CID) references Customer(CID)
+);
+
+create table Reservation_Detail (
+    Reservation_Number varchar(5),
+    Flight_Number varchar(3),
+    Flight_Date date,
+    Leg int,
+    constraint Reservation_Detail_PK primary key (Reservation_Number, Leg),
+    constraint Reservation_Detail_Reservation_Number_FK foreign key (Reservation_Number) references Reservation(Reservation_Number),
+    constraint Reservation_Detail_Flight_Number_FK foreign key (Flight_Number) references Flight(Flight_Number)
+);
+
+create table Date(
+    C_Date date,
+    constraint Date_PK primary key (C_Date)
 );
