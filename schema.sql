@@ -32,7 +32,8 @@ create table Flight (
     Weekly_Schedule varchar(7),
     constraint Flight_PK primary key (Flight_Number),
     constraint Flight_Plane_Type_FK foreign key (Plane_Type) references Plane(Plane_Type),
-    constraint Flight_Airline_ID_FK foreign key (Airline_ID) references Airline(Airline_ID)
+    constraint Flight_Airline_ID_FK foreign key (Airline_ID) references Airline(Airline_ID),
+    constraint Flight_Military_Time_Check check (Departure_Time >= 0000 and Departure_Time <= 2359 and Arrival_Time >= 0000 and Arrival_Time <= 2359)
 );
 
 create table Plane (
