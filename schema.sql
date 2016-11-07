@@ -2,7 +2,7 @@
 -- CS 1555 - Pitt Tours Term Project
 -- 11/06/2016
 
-
+-- Remove all tables if they currently exist in the database
 drop table Airline cascade constraints;
 drop table Flight cascade constraints;
 drop table Plane cascade constraints;
@@ -10,12 +10,15 @@ drop table Price cascade constraints;
 drop table Customer cascade constraints;
 drop table Reservation cascade constraints;
 
+-- Start the creation of the database tables
 create table Airline (
     Airline_ID varchar(5),
     Airline_Name varchar(50),
     Airline_Abbreviation varchar(10),
     Year_Founded int,
-    constraint Airline_PK primary key (Airline_ID)
+    constraint Airline_PK primary key (Airline_ID),
+    constraint Airline_Airline_Name_Unique unique (Airline_Name),   -- Assumption: No two airlines have the same name
+    constraint Airline_Airline_Abbreviation_Unique unique (Airline_Abbreviation)    -- Assumption: No two airlines have the same abbreviation
 );
 
 create table Flight (
@@ -66,5 +69,17 @@ create table Customer (
     Phone varchar(10),
     Email varchar(30),
     Frequent_Miles varchar(5),
-    constraint Customer_PK primary key (CID)
+    constraint Customer_PK primary key (CID),
+    constraint Customer_Salutation_Check check (Salutation in ('Mr', 'Mrs', 'Ms'))
+);
+
+create table Reservation (
+    Reservation_Number varchar(5),
+    CID varchar(9),
+    Cost int,
+    Credit_Card_Num varchar(16),
+    Rservation_Date date,
+    Ticketed varchar(1),
+    constraint Reservation_PK primary key (Reservation_Number),
+    constraint Reservation_CID_FK foreign key (CID) references Customer(CID)
 );
