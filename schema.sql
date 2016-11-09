@@ -17,8 +17,8 @@ create table Airline (
     Airline_Abbreviation varchar(10),
     Year_Founded int,
     constraint Airline_PK primary key (Airline_ID),
-    constraint Airline_Airline_Name_Unique unique (Airline_Name),   -- Assumption: No two airlines have the same name
-    constraint Airline_Airline_Abbreviation_Unique unique (Airline_Abbreviation)    -- Assumption: No two airlines have the same abbreviation
+    constraint Airline_Unique_01 unique (Airline_Name),   -- Assumption: No two airlines have the same name
+    constraint Airline_Unique_02 unique (Airline_Abbreviation)    -- Assumption: No two airlines have the same abbreviation
 );
 
 create table Flight (
@@ -31,9 +31,9 @@ create table Flight (
     Arrival_Time varchar(4),
     Weekly_Schedule varchar(7),
     constraint Flight_PK primary key (Flight_Number),
-    constraint Flight_Plane_Type_FK foreign key (Plane_Type) references Plane(Plane_Type),
-    constraint Flight_Airline_ID_FK foreign key (Airline_ID) references Airline(Airline_ID),
-    constraint Flight_Military_Time_Check check (Departure_Time >= 0000 and Departure_Time <= 2359 and Arrival_Time >= 0000 and Arrival_Time <= 2359)
+    constraint Flight_FK_01 foreign key (Plane_Type) references Plane(Plane_Type),
+    constraint Flight_FK_02 foreign key (Airline_ID) references Airline(Airline_ID),
+    constraint Flight_Check_01 check (Departure_Time >= 0000 and Departure_Time <= 2359 and Arrival_Time >= 0000 and Arrival_Time <= 2359)
 );
 
 create table Plane (
@@ -44,7 +44,7 @@ create table Plane (
     Year int,
     Owner_ID varchar(5),
     constraint Plane_PK primary key (Plane_Type),
-    constraint Plane_Owner_ID_FK foreign key (Owner_ID) references Airline(Airline_ID)
+    constraint Plane_FK_01 foreign key (Owner_ID) references Airline(Airline_ID)
 );
 
 create table Price (
@@ -54,7 +54,7 @@ create table Price (
     High_Price int,
     Low_Price int,
     constraint Price_PK primary key (Departure_City, Arrival_City),
-    constraint Price_Airline_ID_FK foreign key (Airline_ID) references Airline(Airline_ID)
+    constraint Price_FK_01 foreign key (Airline_ID) references Airline(Airline_ID)
 );
 
 create table Customer (
@@ -71,7 +71,7 @@ create table Customer (
     Email varchar(30),
     Frequent_Miles varchar(5),
     constraint Customer_PK primary key (CID),
-    constraint Customer_Salutation_Check check (Salutation in ('Mr', 'Mrs', 'Ms'))
+    constraint Customer_Check_01 check (Salutation in ('Mr', 'Mrs', 'Ms'))
     -- Gotta figure out how the Frequent_Miles thing works
 );
 
@@ -83,7 +83,7 @@ create table Reservation (
     Rservation_Date date,
     Ticketed varchar(1),
     constraint Reservation_PK primary key (Reservation_Number),
-    constraint Reservation_CID_FK foreign key (CID) references Customer(CID)
+    constraint Reservation_FK_01 foreign key (CID) references Customer(CID)
 );
 
 create table Reservation_Detail (
@@ -92,8 +92,8 @@ create table Reservation_Detail (
     Flight_Date date,
     Leg int,
     constraint Reservation_Detail_PK primary key (Reservation_Number, Leg),
-    constraint Reservation_Detail_Reservation_Number_FK foreign key (Reservation_Number) references Reservation(Reservation_Number),
-    constraint Reservation_Detail_Flight_Number_FK foreign key (Flight_Number) references Flight(Flight_Number)
+    constraint Reservation_Detail_FK_01 foreign key (Reservation_Number) references Reservation(Reservation_Number),
+    constraint Reservation_Detail_FK_02 foreign key (Flight_Number) references Flight(Flight_Number)
 );
 
 create table Date(
