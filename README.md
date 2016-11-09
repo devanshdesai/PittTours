@@ -4,8 +4,9 @@
 
 ####Completed
 * Created tables
+* Finished most constraints
 
 ####To Be Finished
-* Look over constraints + schema on all of the tables. I loosely did all of the constraints but I wasn't thorough.
-* Do the triggers. I didn't touch these at all yet.
-* Pull some data out of our asses.
+* Create the Customer(Frequent_Miles) constraint
+* Create the 3 triggers
+* Create 200 users, 300 reservations, 10 airlines, 30 planes, and 100 flights

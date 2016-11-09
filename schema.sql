@@ -9,6 +9,8 @@ drop table Plane cascade constraints;
 drop table Price cascade constraints;
 drop table Customer cascade constraints;
 drop table Reservation cascade constraints;
+drop table Reservation_Detail cascade constraints;
+drop table System_Date cascade constraints;
 
 -- Start the creation of the database tables
 create table Airline (
@@ -19,6 +21,17 @@ create table Airline (
     constraint Airline_PK primary key (Airline_ID),
     constraint Airline_Unique_01 unique (Airline_Name),   -- Assumption: No two airlines have the same name
     constraint Airline_Unique_02 unique (Airline_Abbreviation)    -- Assumption: No two airlines have the same abbreviation
+);
+
+create table Plane (
+    Plane_Type char(4),
+    Manufacture varchar(10),
+    Plane_Capacity int,
+    Last_Service date,
+    Year int,
+    Owner_ID varchar(5),
+    constraint Plane_PK primary key (Plane_Type),
+    constraint Plane_FK_01 foreign key (Owner_ID) references Airline(Airline_ID)
 );
 
 create table Flight (
@@ -36,17 +49,6 @@ create table Flight (
     constraint Flight_Check_01 check (Departure_Time >= 0000 and Departure_Time <= 2359 and Arrival_Time >= 0000 and Arrival_Time <= 2359)
 );
 
-create table Plane (
-    Plane_Type char(4),
-    Manufacture varchar(10),
-    Plane_Capacity int,
-    Last_Service date,
-    Year int,
-    Owner_ID varchar(5),
-    constraint Plane_PK primary key (Plane_Type),
-    constraint Plane_FK_01 foreign key (Owner_ID) references Airline(Airline_ID)
-);
-
 create table Price (
     Departure_City varchar(3),
     Arrival_City varchar(3),
@@ -61,7 +63,7 @@ create table Customer (
     CID varchar(9),
     Salutation varchar(3),
     First_Name varchar(30),
-    Last_Name varcahr(30),
+    Last_Name varchar(30),
     Credit_Card_Num varchar(16),
     Credit_Card_Expire date,
     Street varchar(30),
@@ -72,7 +74,6 @@ create table Customer (
     Frequent_Miles varchar(5),
     constraint Customer_PK primary key (CID),
     constraint Customer_Check_01 check (Salutation in ('Mr', 'Mrs', 'Ms'))
-    -- Gotta figure out how the Frequent_Miles thing works
 );
 
 create table Reservation (
@@ -96,7 +97,7 @@ create table Reservation_Detail (
     constraint Reservation_Detail_FK_02 foreign key (Flight_Number) references Flight(Flight_Number)
 );
 
-create table Date(
+create table System_Date (
     C_Date date,
     constraint Date_PK primary key (C_Date)
 );
