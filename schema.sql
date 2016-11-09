@@ -74,6 +74,7 @@ create table Customer (
     Frequent_Miles varchar(5),
     constraint Customer_PK primary key (CID),
     constraint Customer_Check_01 check (Salutation in ('Mr', 'Mrs', 'Ms'))
+    constraint Frequent_Miles_Check check (Frequent_Miles in (SELECT DISTINCT Airline_ID FROM Airline))
 );
 
 create table Reservation (
@@ -81,7 +82,7 @@ create table Reservation (
     CID varchar(9),
     Cost int,
     Credit_Card_Num varchar(16),
-    Rservation_Date date,
+    Reservation_Date date,
     Ticketed varchar(1),
     constraint Reservation_PK primary key (Reservation_Number),
     constraint Reservation_FK_01 foreign key (CID) references Customer(CID)
@@ -101,3 +102,6 @@ create table System_Date (
     C_Date date,
     constraint Date_PK primary key (C_Date)
 );
+
+commit;
+
