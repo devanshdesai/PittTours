@@ -30,7 +30,7 @@ create table Plane (
     Last_Service date,
     Year int,
     Owner_ID varchar(5),
-    constraint Plane_PK primary key (Plane_Type),
+    constraint Plane_PK primary key (Plane_Type, Owner_ID),
     constraint Plane_FK_01 foreign key (Owner_ID) references Airline(Airline_ID)
 );
 
@@ -44,8 +44,9 @@ create table Flight (
     Arrival_Time varchar(4),
     Weekly_Schedule varchar(7),
     constraint Flight_PK primary key (Flight_Number),
-    constraint Flight_FK_01 foreign key (Plane_Type) references Plane(Plane_Type),
+    constraint Flight_FK_01 foreign key (Plane_Type, Airline_ID) references Plane(Plane_Type, Owner_ID),
     constraint Flight_FK_02 foreign key (Airline_ID) references Airline(Airline_ID),
+    constraint Departure_Arrival_Cities check (Departure_City <> Arrival_City),
     constraint Flight_Check_01 check (Departure_Time >= 0000 and Departure_Time <= 2359 and Arrival_Time >= 0000 and Arrival_Time <= 2359)
 );
 
@@ -74,7 +75,7 @@ create table Customer (
     Frequent_Miles varchar(5),
     constraint Customer_PK primary key (CID),
     constraint Customer_Check_01 check (Salutation in ('Mr', 'Mrs', 'Ms'))
-    constraint Frequent_Miles_Check check (Frequent_Miles in (SELECT DISTINCT Airline_ID FROM Airline))
+    constraint Frequent_Miles_Check check (Frequent_Miles in (SELECT Airline_ID FROM Airline))
 );
 
 create table Reservation (
