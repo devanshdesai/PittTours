@@ -56,7 +56,7 @@ create table Price (
     Airline_ID varchar(5),
     High_Price int,
     Low_Price int,
-    constraint Price_PK primary key (Departure_City, Arrival_City),
+    constraint Price_PK primary key (Departure_City, Arrival_City, Airline_ID),
     constraint Price_FK_01 foreign key (Airline_ID) references Airline(Airline_ID)
 );
 
@@ -74,8 +74,8 @@ create table Customer (
     Email varchar(30),
     Frequent_Miles varchar(5),
     constraint Customer_PK primary key (CID),
-    constraint Customer_Check_01 check (Salutation in ('Mr', 'Mrs', 'Ms'))
-    constraint Frequent_Miles_Check check (Frequent_Miles in (SELECT Airline_ID FROM Airline))
+    constraint Customer_Check_01 check (Salutation in ('Mr', 'Mrs', 'Ms')),
+    constraint Frequent_Miles_Check check (Frequent_Miles in ('001','002','003','004','005','006','007','008','009','010', null))
 );
 
 create table Reservation (
@@ -106,3 +106,7 @@ create table System_Date (
 
 commit;
 
+--Triggers
+
+CREATE OR REPLACE TRIGGER adjustTicket 
+AFTER UPDATE 
