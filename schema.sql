@@ -85,6 +85,8 @@ create table Reservation (
     Credit_Card_Num varchar(16),
     Reservation_Date date,
     Ticketed varchar(1),
+    Departure_City varchar(3),
+    Arrival_City varchar(3),
     constraint Reservation_PK primary key (Reservation_Number),
     constraint Reservation_FK_01 foreign key (CID) references Customer(CID)
 );
@@ -108,5 +110,24 @@ commit;
 
 --Triggers
 
-CREATE OR REPLACE TRIGGER adjustTicket 
-AFTER UPDATE 
+CREATE OR REPLACE TRIGGER adjustTicket
+AFTER UPDATE OF high_price, low_price ON PRICE
+FOR EACH ROW
+DECLARE
+    reservationNumber varchar(5);
+    startCity varchar(3);
+    endCity varchar(3);
+BEGIN
+    IF UPDATING('low_price') THEN
+        UPDATE RESERVATION SET
+        cost = :NEW.low_price
+        WHERE Start_City = :NEW.departure_city AND End_City = :NEW.arrival_city;
+    ELSE
+        UPDATE RESERVATION SET
+        cost = :NEW.high_price
+        WHERE Start_City = :NEW.departure_city AND End_City = :NEW.arrival_city;
+    END IF;
+    EXCEPTION WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('No data found');
+END;
+/
