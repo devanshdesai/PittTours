@@ -1,13 +1,13 @@
-INSERT INTO Airline VALUES('001', 'American Airlines', 'AAL', 1936);
-INSERT INTO Airline VALUES('002', 'United Airlines', 'UAL', 1931);
-INSERT INTO Airline VALUES('003', 'Delta Air Lines', 'DAL', 1924);
-INSERT INTO Airline VALUES('004', 'All Nippon Airlines', 'ANA', 1952);
-INSERT INTO Airline VALUES('005', 'American Eagle Airlines', 'EGF', 1979);
-INSERT INTO Airline VALUES('006', 'Southwest Airlines', 'SWA', 1946);
-INSERT INTO Airline VALUES('007', 'SunExpress', 'SXS', 1993);
-INSERT INTO Airline VALUES('008', 'Virgin America', 'VRD', 1952);
-INSERT INTO Airline VALUES('009', 'US Airways', 'AWE', 1960);
-INSERT INTO Airline VALUES('010', 'United Parcel Service', 'UPS', 1907);
+INSERT INTO Airline VALUES('00001', 'American Airlines', 'AAL', 1936);
+INSERT INTO Airline VALUES('00002', 'United Airlines', 'UAL', 1931);
+INSERT INTO Airline VALUES('00003', 'Delta Air Lines', 'DAL', 1924);
+INSERT INTO Airline VALUES('00004', 'All Nippon Airlines', 'ANA', 1952);
+INSERT INTO Airline VALUES('00005', 'American Eagle Airlines', 'EGF', 1979);
+INSERT INTO Airline VALUES('00006', 'Southwest Airlines', 'SWA', 1946);
+INSERT INTO Airline VALUES('00007', 'SunExpress', 'SXS', 1993);
+INSERT INTO Airline VALUES('00008', 'Virgin America', 'VRD', 1952);
+INSERT INTO Airline VALUES('00009', 'US Airways', 'AWE', 1960);
+INSERT INTO Airline VALUES('00010', 'United Parcel Service', 'UPS', 1907);
 
 insert into Plane values ('A254', 'Airbus', 184, TO_DATE('04-06-2001','MM-DD-YYYY'), 1969, '001');
 insert into Plane values ('N794', 'Northrop', 145, TO_DATE('08-03-2012','MM-DD-YYYY'), 1966, '001');
@@ -160,7 +160,7 @@ insert into Flight values ('157', '009', 'N319', 'PIT', 'SFO', '1150', '1227', '
 insert into Flight values ('158', '010', 'C701', 'PIT', 'LAX', '1157', '1812', '-M-W-F-');
 insert into Flight values ('159', '010', 'E919', 'PIT', 'DFW', '1058', '1751', 'SM-W-FS');
 insert into Flight values ('160', '010', 'C380', 'PIT', 'DCA', '1037', '1250', 'SM--TFS');
-	
+
 insert into Customer values ('963881655', 'Mrs', 'Gary', 'Hudson', '2014862854739734', TO_DATE('04-11-2017','MM-DD-YYYY'), 'Farmco', 'Gilbert', 'AZ', '6027161822', 'ghudson1@skype.com', '002');
 insert into Customer values ('956462865', 'Mrs', 'Dennis', 'Chapman', '3556029495760499', TO_DATE('05-30-2017','MM-DD-YYYY'), 'Grayhawk', 'Fort Lauderdale', 'FL', '7541343996', 'dchapman2@newsvine.com', null);
 insert into Customer values ('787776600', 'Mr', 'Thomas', 'King', '4508741498135803', TO_DATE('01-23-2018','MM-DD-YYYY'), 'Darwin', 'Minneapolis', 'MN', '6126274515', 'tking3@ox.ac.uk', null);
@@ -1084,4 +1084,3 @@ insert into Reservation_detail values ('00297', '002', TO_DATE('2016-11-23', 'YY
 insert into Reservation_detail values ('00298', '002', TO_DATE('2016-11-23', 'YYYY-MM-DD'), 0);
 insert into Reservation_detail values ('00299', '002', TO_DATE('2016-11-23', 'YYYY-MM-DD'), 0);
 insert into Reservation_detail values ('00300', '002', TO_DATE('2016-11-23', 'YYYY-MM-DD'), 0);
-
