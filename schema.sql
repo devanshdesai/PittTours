@@ -19,8 +19,8 @@ CREATE TABLE Airline (
     Airline_Abbreviation varchar(10),
     Year_Founded int,
     CONSTRAINT Airline_PK PRIMARY KEY (Airline_ID),
-    CONSTRAINT Airline_Unique_01 unique (Airline_Name),   -- Assumption: No two airlines have the same name
-    CONSTRAINT Airline_Unique_02 unique (Airline_Abbreviation)    -- Assumption: No two airlines have the same abbreviation
+    CONSTRAINT Airline_Unique_01 UNIQUE (Airline_Name),   -- Assumption: No two airlines have the same name
+    CONSTRAINT Airline_Unique_02 UNIQUE (Airline_Abbreviation)    -- Assumption: No two airlines have the same abbreviation
 );
 
 CREATE TABLE Plane (
@@ -76,7 +76,7 @@ CREATE TABLE Customer (
     Frequent_Miles varchar(5),
     CONSTRAINT Customer_PK PRIMARY KEY (CID),
     CONSTRAINT Customer_Check_01 CHECK (Salutation in ('Mr', 'Mrs', 'Ms')),
-    CONSTRAINT Frequent_Miles_Check CHECK (Frequent_Miles in ('001','002','003','004','005','006','007','008','009','010', null))
+    CONSTRAINT Customer_Check_02 CHECK (Frequent_Miles in ('001','002','003','004','005','006','007','008','009','010', null))
 );
 
 CREATE TABLE Reservation (
@@ -107,12 +107,10 @@ CREATE TABLE System_Date (
     CONSTRAINT Date_PK PRIMARY KEY (C_Date)
 );
 
-commit;
 
---Triggers
-
+-- Triggers
 CREATE OR REPLACE TRIGGER adjustTicket
-AFTER UPDATE OF high_price, low_price ON PRICE
+AFTER UPDATE OF High_Price, Low_Price ON Price
 FOR EACH ROW
 DECLARE
     reservationNumber varchar(5);
@@ -121,14 +119,19 @@ DECLARE
 BEGIN
     IF UPDATING('low_price') THEN
         UPDATE RESERVATION SET
-        cost = :NEW.low_price
-        WHERE Start_City = :NEW.departure_city AND End_City = :NEW.arrival_city;
+        Cost = :NEW.Low_Price
+        WHERE Start_City = :NEW.Departure_City AND End_City = :NEW.Arrival_City;
     ELSE
         UPDATE RESERVATION SET
-        cost = :NEW.high_price
-        WHERE Start_City = :NEW.departure_city AND End_City = :NEW.arrival_city;
+        Cost = :NEW.High_Price
+        WHERE Start_City = :NEW.Departure_City AND End_City = :NEW.Arrival_City;
     END IF;
     EXCEPTION WHEN NO_DATA_FOUND THEN
         DBMS_OUTPUT.PUT_LINE('No data found');
 END;
 /
+
+CREATE OR REPLACE TRIGGER planeUpgrade
+AFTER INSERT ON Reservation_Detail
+FOR EACH ROW
+DECLARE

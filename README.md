@@ -11,6 +11,12 @@
 
 #### To Be Finished
 * Create the remaining 2 triggers
+* Make Frequent_Miles trigger
 
+___
 
 ## Milestone 02
+
+#### Completed
+
+#### To Be Finished
