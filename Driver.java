@@ -1,4 +1,5 @@
 import java.sql.*;  //import the file containing definitions for the parts
+import java.util.Scanner;
 //import java.text.ParseException;
 
 public class Driver {
@@ -9,53 +10,138 @@ public class Driver {
     private String query;  //this will hold the query we are using
 
 	public Driver(){
-		int counter = 1;
-		/*We will now perform a simple query to the database, asking for all the
-		records it has.  For your project, performing queries will be similar*/
-		try{
-		    statement = connection.createStatement(); //create an instance
-		    String selectQuery = "SELECT * FROM Airline"; //sample query
-		    
-		    resultSet = statement.executeQuery(selectQuery); //run the query on the DB table
-		    
-		    /*the results in resultSet have an odd quality. The first row in result
-		      set is not relevant data, but rather a place holder.  This enables us to
-		      use a while loop to go through all the records.  We must move the pointer
-		      forward once using resultSet.next() or you will get errors*/
-
-		    while (resultSet.next()) //this not only keeps track of if another record
-			//exists but moves us forward to the first record
-		    {
-		    	System.out.println("Record " + counter + ": " +
-			      resultSet.getString(1) + ", " + //since the first item was of type
-			      //string, we use getString of the
-			      //resultSet class to access it.
-			      //Notice the one, that is the
-			      //position of the answer in the
-			      //resulting table
-			      resultSet.getLong(2) + ", " +   //since second item was number(10),
-			      //we use getLong to access it
-			      resultSet.getDate(3)); //since type date, getDate.
-		    	counter++;
-		    }
-		    resultSet.close();
+		System.out.println("Hello, if you would like the administrator interface, press [1] and [return]");
+		Scanner scan = new Scanner(System.in);
+		int mode = scan.nextInt();
+		int operation = 0;
+		if(mode == 1) {
+			while(){
+				System.out.println("Choose an operation: \n 
+					[1] Erase the database \n
+					[2] Load airline information \n
+					[3] Load schedule information \n
+					[4] Load pricing information \n
+					[5] Load plane information \n
+					[6] Generate passenger manifest for specific flight on given day \n
+					[7] Exit");
+				operation = scan.nextInt();
+				switch (operation) {
+					case 1:
+						System.out.println("Are you sure? [y/n]");
+						String response = scan.nextLine();
+						if(response.equals("y")) 
+						break;
+					case 2:
+						break;
+					case 3:
+						break;
+					case 4:
+						break;
+					case 5:
+						break;
+					case 6:
+						break;
+					case 7:
+						System.exit(0);
+					default:
+						System.out.println("Not a valid operation code")
+				}
+			}
 		}
-	    catch(SQLException Ex) {
-			System.out.println("Error running the sample queries.  Machine Error: " + Ex.toString());
-		} 
-		/*catch (ParseException e) {
-			System.out.println("Error parsing the date. Machine Error: " + e.toString());
-		}*/
-		finally{
-			try {
-				if (statement != null) statement.close();
-				if (prepStatement != null) prepStatement.close();
-			} 
-			catch (SQLException e) {
-				System.out.println("Cannot close Statement. Machine error: " + e.toString());
+		else{
+			while(){
+				System.out.println("Choose an operation: \n 
+					[1] Add customer \n
+					[2] Show customer info, given customer name \n
+					[3] Find price for flights between two cities \n
+					[4] Find all routes between two cities \n
+					[5] Find all routes between two cities of a given airline \n
+					[6] Find all routes with available seats between two cities on given day \n
+					[7] For a given airline, find all routes with available seats between two cities on given day \n
+					[8] Add reservation \n
+					[9] Show reservation info, given reservation number \n
+					[10] Buy ticket from existing reservation\n
+					[11] Exit");
+				operation = scan.nextInt();
+				switch (operation) {
+					case 1:
+						break;
+					case 2:
+						break;
+					case 3:
+						break;
+					case 4:
+						break;
+					case 5:
+						break;
+					case 6:
+						break;
+					case 7:
+						break;
+					case 8:
+						break;
+					case 9:
+						break;
+					case 10:
+						break;
+					case 11:
+						System.exit(0);
+					default:
+						System.out.println("Not a valid operation code")
+				}
 			}
 		}
 	}
+
+	private void eraseDatabase(){
+
+	}
+	private void loadAirline(){
+
+	}
+	private void loadSchedule(){
+		
+	}
+	private void loadPrice(){
+		
+	}
+	private void loadPlane(){
+		
+	}
+	private void passengerManifest(){
+		
+	}
+	private void addCustomer(){
+		
+	}
+	private void showCustomer(){
+		
+	}
+	private void findPrice(){
+		
+	}
+	private void routesBetweenCities(){
+		
+	}
+	private void routesBetweenCitiesOnAirline(){
+		
+	}
+	private void availableSeats(){
+		
+	}
+	private void availableSeatsOnAirline(){
+		
+	}
+	private void addReservation(){
+		
+	}
+	private void showReservation(){
+		
+	}
+	private void buyTickets(){
+		
+	}
+
 
 	public static void main(String args[]) throws SQLException {
 		String username = "kwz5";
