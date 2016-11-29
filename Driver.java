@@ -231,8 +231,8 @@ public class Driver {
 	private void loadAirline(String filename) {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(filename));
+			Statement s = connection.createStatement();
 			String line;
-			Statement s;
 			String sql;
 			String[] airline;
 
@@ -255,8 +255,8 @@ public class Driver {
 	private void loadSchedule(String filename) {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(filename));
+			Statement s = connection.createStatement();
 			String line;
-			Statement s;
 			String sql;
 			String[] flight;
 
@@ -277,10 +277,11 @@ public class Driver {
 		}
 	}
 	private void loadPrice(String filename) {
-		try {
+		// This code works but needs to be made tailored to the specs in the sheet
+		/*try {
 			BufferedReader br = new BufferedReader(new FileReader(filename));
+			Statement s = connection.createStatement();
 			String line;
-			Statement s;
 			String sql;
 			String[] price;
 
@@ -298,13 +299,13 @@ public class Driver {
 		}
 		catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 	private void loadPlane(String filename) {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(filename));
+			Statement s = connection.createStatement();
 			String line;
-			Statement s;
 			String sql;
 			String[] plane;
 
@@ -327,25 +328,53 @@ public class Driver {
 	private void passengerManifest(String flightNumber, String date) {
 
 	}
-	private void addCustomer() {
+	private void addCustomer(String salutation, String first, String last, String credit, String creditExpire, String street, String city, String state, String phone, String email, String freqFlyer) {
+		try {
+			Statement s = connection.createStatement();
+			String sql = "SELECT COUNT(*) FROM Customer WHERE First_Name = '" + first + "' AND Last_Name = '" + last + "';";
+			ResultSet r = s.executeQuery(sql);
+			int count = r.getInt(1);
 
+			if (count > 0) {
+				System.out.println("Customer was not added. There is already a person with the same first and last name in the database.\n");
+			}
+			else {
+				sql = "SELECT MAX(CID) FROM Customer;";
+				r = s.executeQuery(sql);
+				String lastCID = r.getString(1);
+				if (lastCID == null) {
+					int currentCID = 1;
+				}
+				else {
+					int currentCID = Integer.parseInt(lastCID) + 1;
+				}
+
+				sql = "INSERT INTO CUSTOMER VALUES('" + currentCID + "', '" + salutation + "', '" + first + "', '" + last + "', '" + credit +  + "', TO_DATE('"
+				+ creditExpire + "','MM-DD-YYYY'), '" + street + "', '" + city  + "', '" + state + "', '" + phone + "', '" + email + "', '" + freqMiles;
+				s.executeQuery(sql);
+				System.out.println("Customer was successfully added.\n");
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	private void showCustomer(String name) {
 
 	}
-	private void findPrice(String cityA,String cityB) {
+	private void findPrice(String cityA, String cityB) {
 
 	}
-	private void routesBetweenCities(String cityA,String cityB) {
+	private void routesBetweenCities(String cityA, String cityB) {
 
 	}
-	private void routesBetweenCitiesOnAirline(String cityA,String cityB, String airline) {
+	private void routesBetweenCitiesOnAirline(String cityA, String cityB, String airline) {
 
 	}
-	private void availableSeats(String cityA,String cityB, String date) {
+	private void availableSeats(String cityA, String cityB, String date) {
 
 	}
-	private void availableSeats(String cityA,String cityB, String date, String airline) {
+	private void availableSeats(String cityA, String cityB, String date, String airline) {
 
 	}
 	private void addReservation(String flights[], String dates[]) {
