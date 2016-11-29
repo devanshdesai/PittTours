@@ -228,6 +228,7 @@ public class Driver {
 			System.out.println("Error deleting the database. " + e.toString());
 		}
 	}
+
 	private void loadAirline(String filename) {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(filename));
@@ -252,6 +253,7 @@ public class Driver {
 			e.printStackTrace();
 		}
 	}
+
 	private void loadSchedule(String filename) {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(filename));
@@ -276,6 +278,7 @@ public class Driver {
 			e.printStackTrace();
 		}
 	}
+
 	private void loadPrice(String filename) {
 		// This code works but needs to be made tailored to the specs in the sheet
 		/*try {
@@ -301,6 +304,7 @@ public class Driver {
 			e.printStackTrace();
 		}*/
 	}
+
 	private void loadPlane(String filename) {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(filename));
@@ -325,9 +329,11 @@ public class Driver {
 			e.printStackTrace();
 		}
 	}
+
 	private void passengerManifest(String flightNumber, String date) {
 
 	}
+
 	private void addCustomer(String salutation, String first, String last, String credit, String creditExpire, String street, String city, String state, String phone, String email, String freqFlyer) {
 		try {
 			Statement s = connection.createStatement();
@@ -359,30 +365,68 @@ public class Driver {
 			e.printStackTrace();
 		}
 	}
-	private void showCustomer(String name) {
 
+	private void showCustomer(String first, String last) {
+		try {
+			Statement s = connection.createStatement();
+			String sql = "SELECT * FROM Customer WHERE First_Name = '" + first + "' AND Last_Name = '" + last + "';";
+			ResultSet r = s.executeQuery(sql);
+
+			if (!r.first()) {
+				String cid = r.getString(1);
+				String salutation = r.getString(2);
+				String credit = r.getString(5);
+				Date creditExpire = r.getDate(6);
+				String street = r.getString(7);
+				String city = r.getString(8);
+				String state = r.getString(9);
+				String phone = r.getString(10);
+				String email = r.getString(11);
+				String freq = r.getString(12);
+
+				DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+				String creditExpireStr = df.format(creditExpire);
+
+				System.out.println(salutation + ". " + first + " " + last + "\n" + email + "\n" + phone + "\n" + street + "\n" + city + ", " + state
+				+ "\n" + credit + "\n" + creditExpireStr + "\n" + "PittRewards #: " + cid + "\nFrequent Flyer #: " + freq + "\n");
+			}
+			else {
+				System.out.println(first + " " + last + "was not found in the database.\n");
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
+
 	private void findPrice(String cityA, String cityB) {
 
 	}
+
 	private void routesBetweenCities(String cityA, String cityB) {
 
 	}
+
 	private void routesBetweenCitiesOnAirline(String cityA, String cityB, String airline) {
 
 	}
+
 	private void availableSeats(String cityA, String cityB, String date) {
 
 	}
+
 	private void availableSeats(String cityA, String cityB, String date, String airline) {
 
 	}
+
 	private void addReservation(String flights[], String dates[]) {
 
 	}
+
 	private void showReservation(String reservation) {
 
 	}
+
 	private void buyTickets(String reservation) {
 
 	}
