@@ -242,7 +242,8 @@ public class Driver {
 				s.executeUpdate(sql);
 			}
 
-			System.out.println("Airlines were loaded from " + filename);
+			br.close();
+			System.out.println("Airlines were loaded from " + filename + ".\n");
 		}
 		catch (FileNotFoundException e) {
 			System.out.println("The file was not found.\n");
@@ -265,7 +266,8 @@ public class Driver {
 				s.executeUpdate(sql);
 			}
 
-			System.out.println("Flights were loaded from " + filename);
+			br.close();
+			System.out.println("Flights were loaded from " + filename + ".\n");
 		}
 		catch (FileNotFoundException e) {
 			System.out.println("The file was not found.\n");
@@ -284,11 +286,12 @@ public class Driver {
 
 			while ((line = br.readLine()) != null) {
 				price = line.split(",");
-				sql = "INSERT INTO Airline VALUES('" + airline[0] + "', '" + airline[1] + "', '" + airline[2] + "', " + airline[3] + ", " + airline[4]  + ");";
+				sql = "INSERT INTO Price VALUES('" + airline[0] + "', '" + airline[1] + "', '" + airline[2] + "', " + airline[3] + ", " + airline[4]  + ");";
 				s.executeUpdate(sql);
 			}
 
-			System.out.println("Prices were loaded from " + filename);
+			br.close();
+			System.out.println("Prices were loaded from " + filename + ".\n");
 		}
 		catch (FileNotFoundException e) {
 			System.out.println("The file was not found.\n");
@@ -298,7 +301,28 @@ public class Driver {
 		}
 	}
 	private void loadPlane(String filename) {
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(filename));
+			String line;
+			Statement s;
+			String sql;
+			String[] plane;
 
+			while ((line = br.readLine()) != null) {
+				plane = line.split(",");
+				sql = "INSERT INTO Plane VALUES('" + plane[0] + "', '" + plane[1] + "', " + plane[2] + ", TO_DATE('" + plane[3] + "', 'MM_DD-YYY'), " + plane[4]  + ", '" + plane[5] + "');";
+				s.executeUpdate(sql);
+			}
+
+			br.close();
+			System.out.println("Planes were loaded from " + filename + ".\n");
+		}
+		catch (FileNotFoundException e) {
+			System.out.println("The file was not found.\n");
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	private void passengerManifest(String flightNumber, String date) {
 
