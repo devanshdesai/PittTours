@@ -336,6 +336,9 @@ public class Driver {
 			String sql = "SELECT Salution, First_Name, Last_Name FROM Customer c INNER JOIN Reservation r ON c.CID = r.CID INNER JOIN Reservation_Detail rd ON r.Reservation_Number = rd.Reservation_Number WHERE rd.Flight_Number = '" + flightNumber + "' AND Flight_Date = TO_DATE('" + date + "','MM-DD-YYYY');";
 			ResultSet r = s.executeQuery(sql);
 
+			do {
+				System.out.println(r.getString(1) + ". " + r.getString(2) + " " + r.getString(3));
+			} while (r.next());
 		}
 		catch (Exception e) {
 			System.out.println(e.toString());
