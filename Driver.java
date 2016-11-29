@@ -14,41 +14,43 @@ public class Driver {
 		Scanner scan = new Scanner(System.in);
 		int mode = scan.nextInt();
 		int operation = 0;
+		String response;
+
 		if(mode == 1) {
-			while() {
-				System.out.println("Choose an operation: \n
-					[1] Erase the database \n
-					[2] Load airline information \n
-					[3] Load schedule information \n
-					[4] Load pricing information \n
-					[5] Load plane information \n
-					[6] Generate passenger manifest for specific flight on given day \n
-					[7] Exit");
+			while(true) {
+				System.out.println("Choose an operation: \n"
+					+ "[1] Erase the database \n"
+					+ "[2] Load airline information \n"
+					+ "[3] Load schedule information \n"
+					+ "[4] Load pricing information \n"
+					+ "[5] Load plane information \n"
+					+ "[6] Generate passenger manifest for specific flight on given day \n"
+					+ "[7] Exit");
 				operation = scan.nextInt();
 				switch (operation) {
 					case 1:
 						System.out.println("Are you sure you want to erase all tuples? [y/n]");
-						String response = scan.nextLine();
+						response = scan.nextLine();
 						if(response.equals("y")) eraseDatabase();
 						break;
 					case 2:
 						System.out.println("Enter file name");
-						String response = scan.nextLine();
+						response = scan.nextLine();
 						loadAirline(response);
 						break;
 					case 3:
 						System.out.println("Enter file name");
-						String response = scan.nextLine();
+						response = scan.nextLine();
 						loadSchedule(response);
 						break;
 					case 4:
 						System.out.println("Enter file name");
-						String response = scan.nextLine();
+						response = scan.nextLine();
 						loadSchedule(response);
 						break;
 					case 5:
 						System.out.println("Enter file name");
-						String response = scan.nextLine();
+						response = scan.nextLine();
 						loadPlane(response);
 						break;
 					case 6:
@@ -56,30 +58,36 @@ public class Driver {
 						String flight = scan.nextLine();
 						System.out.println("Enter date [MM-DD-YYYY]");
 						String date = scan.nextLine();
-						passengerManifest(flight,date);
+						passengerManifest(flight, date);
 						break;
 					case 7:
 						System.exit(0);
 					default:
-						System.out.println("Not a valid operation code")
+						System.out.println("Not a valid operation code");
 				}
 			}
 		}
 		else{
-			while() {
-				System.out.println("Choose an operation: \n
-					[1] Add customer \n
-					[2] Show customer info, given customer name \n
-					[3] Find price for flights between two cities \n
-					[4] Find all routes between two cities \n
-					[5] Find all routes between two cities of a given airline \n
-					[6] Find all routes with available seats between two cities on given day \n
-					[7] For a given airline, find all routes with available seats between two cities on given day \n
-					[8] Add reservation \n
-					[9] Show reservation info, given reservation number \n
-					[10] Buy ticket from existing reservation\n
-					[11] Exit");
+			while(true) {
+				System.out.println("Choose an operation: \n"
+					+ "[1] Add customer \n"
+					+ "[[2] Show customer info, given customer name \n"
+					+ "[[3] Find price for flights between two cities \n"
+					+ "[[4] Find all routes between two cities \n"
+					+ "[[5] Find all routes between two cities of a given airline \n"
+					+ "[[6] Find all routes with available seats between two cities on given day \n"
+					+ "[[7] For a given airline, find all routes with available seats between two cities on given day \n"
+					+ "[[8] Add reservation \n"
+					+ "[[9] Show reservation info, given reservation number \n"
+					+ "[[10] Buy ticket from existing reservation\n"
+					+ "[[11] Exit");
 				operation = scan.nextInt();
+				String cityA;
+				String cityB;
+				String date;
+				String airline;
+				String reservation;
+
 				switch (operation) {
 					case 1:
 						addCustomer();
@@ -91,58 +99,63 @@ public class Driver {
 						break;
 					case 3:
 						System.out.println("Enter start city (eg. PIT)");
-						String cityA = scan.nextLine();
+						cityA = scan.nextLine();
 						System.out.println("Enter end city");
-						String cityB = scan.nextLine();
-						findPrice(cityA,cityB);
+						cityB = scan.nextLine();
+						findPrice(cityA, cityB);
 						break;
 					case 4:
 						System.out.println("Enter start city (eg. PIT)");
-						String cityA = scan.nextLine();
+						cityA = scan.nextLine();
 						System.out.println("Enter end city");
-						String cityB = scan.nextLine();
-						routesBetweenCities(cityA,cityB);
+						cityB = scan.nextLine();
+						routesBetweenCities(cityA, cityB);
 						break;
 					case 5:
 						System.out.println("Enter start city (eg. PIT)");
-						String cityA = scan.nextLine();
+						cityA = scan.nextLine();
 						System.out.println("Enter end city");
-						String cityB = scan.nextLine();
+						cityB = scan.nextLine();
 						System.out.println("Enter airline code (eg. AAL)");
-						String airline = scan.nextLine();
-						routesBetweenCitiesOnAirline(cityA,cityB,airline);
+						airline = scan.nextLine();
+						routesBetweenCitiesOnAirline(cityA, cityB, airline);
 						break;
 					case 6:
 						System.out.println("Enter start city (eg. PIT)");
-						String cityA = scan.nextLine();
+						cityA = scan.nextLine();
 						System.out.println("Enter end city");
-						String cityB = scan.nextLine();
+						cityB = scan.nextLine();
 						System.out.println("Enter date [MM-DD-YYYY]");
-						String date = scan.nextLine();
-						availableSeats(cityA,cityB,date);
+						date = scan.nextLine();
+						availableSeats(cityA, cityB, date);
 						break;
 					case 7:
 						System.out.println("Enter start city (eg. PIT)");
-						String cityA = scan.nextLine();
+						cityA = scan.nextLine();
 						System.out.println("Enter end city");
-						String cityB = scan.nextLine();
+						cityB = scan.nextLine();
 						System.out.println("Enter date [MM-DD-YYYY]");
-						String date = scan.nextLine();
+						date = scan.nextLine();
 						System.out.println("Enter airline code (eg. AAL)");
-						String airline = scan.nextLine();
-						availableSeats(cityA,cityB,date,airline);
+						airline = scan.nextLine();
+						availableSeats(cityA, cityB, date, airline);
 						break;
 					case 8:
 						int leg = 0;
 						String flights[] = new String[4];
 						String dates[] = new String[4];
+
 						while(leg < 4) {
 							System.out.println("Enter flight number or [0] if you are finished");
 							String flightNumber = scan.nextLine();
-							if(flightNumber.equals("0")) break;
+
+							if (flightNumber.equals("0")) {
+								break;
+							}
+
 							flights[leg] = flightNumber;
 							System.out.println("Enter date [MM-DD-YYYY]");
-							String date = scan.nextLine();
+							date = scan.nextLine();
 							dates[leg] = date;
 							leg++;
 						}
@@ -150,18 +163,18 @@ public class Driver {
 						break;
 					case 9:
 						System.out.println("Enter reservation number");
-						String reservation = scan.nextLine();
+						reservation = scan.nextLine();
 						showReservation(reservation);
 						break;
 					case 10:
 						System.out.println("Enter reservation number");
-						String reservation = scan.nextLine();
+						reservation = scan.nextLine();
 						buyTickets(reservation);
 						break;
 					case 11:
 						System.exit(0);
 					default:
-						System.out.println("Not a valid operation code")
+						System.out.println("Not a valid operation code");
 				}
 			}
 		}
@@ -212,7 +225,7 @@ public class Driver {
 	private void availableSeats(String cityA,String cityB, String date) {
 
 	}
-	private void availableSeatsOnAirline(String cityA,String cityB, String date, String airline) {
+	private void availableSeats(String cityA,String cityB, String date, String airline) {
 
 	}
 	private void addReservation(String flights[], String dates[]) {
