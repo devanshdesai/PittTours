@@ -1,22 +1,22 @@
-import java.sql.*;  
+import java.sql.*;
 import java.util.Scanner;
 //import java.text.ParseException;
 
 public class Driver {
-	private static Connection connection; 
-    private Statement statement; 
-    private PreparedStatement prepStatement; 
-    private ResultSet resultSet; 
-    private String query;  
+	private static Connection connection;
+    private Statement statement;
+    private PreparedStatement prepStatement;
+    private ResultSet resultSet;
+    private String query;
 
-	public Driver(){
+	public Driver() {
 		System.out.println("Hello, if you would like the administrator interface, press [1] and [return]. For the user interface, press [2] and [return].");
 		Scanner scan = new Scanner(System.in);
 		int mode = scan.nextInt();
 		int operation = 0;
 		if(mode == 1) {
-			while(){
-				System.out.println("Choose an operation: \n 
+			while() {
+				System.out.println("Choose an operation: \n
 					[1] Erase the database \n
 					[2] Load airline information \n
 					[3] Load schedule information \n
@@ -66,8 +66,8 @@ public class Driver {
 			}
 		}
 		else{
-			while(){
-				System.out.println("Choose an operation: \n 
+			while() {
+				System.out.println("Choose an operation: \n
 					[1] Add customer \n
 					[2] Show customer info, given customer name \n
 					[3] Find price for flights between two cities \n
@@ -136,7 +136,7 @@ public class Driver {
 						int leg = 0;
 						String flights[] = new String[4];
 						String dates[] = new String[4];
-						while(leg < 4){
+						while(leg < 4) {
 							System.out.println("Enter flight number or [0] if you are finished");
 							String flightNumber = scan.nextLine();
 							if(flightNumber.equals("0")) break;
@@ -167,53 +167,62 @@ public class Driver {
 		}
 	}
 
-	private void eraseDatabase(){
+	private void eraseDatabase() {
+		try {
+			Statement s = connection.createStatement();
+			String sql = "DELETE * FROM Reservation_Detail;DELETE * FROM Reservation;DELETE * FROM Price;DELETE * FROM Customer;DELETE * FROM Flight;DELETE * FROM Plane;DELETE * FROM Airline;";
+			s.executeUpdate(sql);
+
+			System.out.println("Database was deleted.");
+		}
+		catch (Exception e) {
+			System.out.println("Error deleting the database. " + e.toString());
+		}
+	}
+	private void loadAirline(String filename) {
 
 	}
-	private void loadAirline(String filename){
+	private void loadSchedule(String filename) {
 
 	}
-	private void loadSchedule(String filename){
-		
+	private void loadPrice(String filename) {
+
 	}
-	private void loadPrice(String filename){
-		
+	private void loadPlane(String filename) {
+
 	}
-	private void loadPlane(String filename){
-		
+	private void passengerManifest(String flightNumber, String date) {
+
 	}
-	private void passengerManifest(String flightNumber, String date){
-		
+	private void addCustomer() {
+
 	}
-	private void addCustomer(){
-		
+	private void showCustomer(String name) {
+
 	}
-	private void showCustomer(String name){
-		
+	private void findPrice(String cityA,String cityB) {
+
 	}
-	private void findPrice(String cityA,String cityB){
-		
+	private void routesBetweenCities(String cityA,String cityB) {
+
 	}
-	private void routesBetweenCities(String cityA,String cityB){
-		
+	private void routesBetweenCitiesOnAirline(String cityA,String cityB, String airline) {
+
 	}
-	private void routesBetweenCitiesOnAirline(String cityA,String cityB, String airline){
-		
+	private void availableSeats(String cityA,String cityB, String date) {
+
 	}
-	private void availableSeats(String cityA,String cityB, String date){
-		
+	private void availableSeatsOnAirline(String cityA,String cityB, String date, String airline) {
+
 	}
-	private void availableSeatsOnAirline(String cityA,String cityB, String date, String airline){
-		
+	private void addReservation(String flights[], String dates[]) {
+
 	}
-	private void addReservation(String flights[], String dates[]){
-		
+	private void showReservation(String reservation) {
+
 	}
-	private void showReservation(String reservation){
-		
-	}
-	private void buyTickets(String reservation){
-		
+	private void buyTickets(String reservation) {
+
 	}
 
 
@@ -222,11 +231,11 @@ public class Driver {
 		String password = "asdfj";
 
 		try{
-		    
+
 			DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
-		  	String url = "jdbc:oracle:thin:@class3.cs.pitt.edu:1521:dbclass"; 
-			
-			connection = DriverManager.getConnection(url, username, password); 
+		  	String url = "jdbc:oracle:thin:@class3.cs.pitt.edu:1521:dbclass";
+
+			connection = DriverManager.getConnection(url, username, password);
 			Driver driver = new Driver();
 		}
 		catch(Exception Ex)  {
