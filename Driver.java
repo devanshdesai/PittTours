@@ -56,9 +56,29 @@ public class Driver {
 						loadSchedule(response);
 						break;
 					case 4:
-						System.out.println("Enter file name");
+						System.out.println("Would you like to load pricing information [L] or change the price of an exisiting flight [C]? [L/C]");
 						scan.skip("\n");
 						response = scan.nextLine();
+						if ((response.toUpperCase()).equals("L")) {
+							System.out.println("Enter file name");
+							scan.skip("\n");
+							response = scan.nextLine();
+						}
+						else if ((response.toUpperCase()).equals("C")) {
+							System.out.println("Enter the departure city");
+							scan.skip("\n");
+							String departureCity = scan.nextLine();
+							System.out.println("Enter the arrival city");
+							scan.skip("\n");
+							String arrivalCity = scan.nextLine();
+							System.out.println("Enter the new high price");
+							scan.skip("\n");
+							int highPrice = scan.nextInt();
+							System.out.println("Enter the new low price");
+							scan.skip("\n");
+							int lowPrice = scan.nextInt();
+							changePrice(departureCity, arrivalCity, highPrice, lowPrice);
+						}
 						loadSchedule(response);
 						break;
 					case 5:
@@ -279,9 +299,7 @@ public class Driver {
 		}
 	}
 
-	private void loadPrice(String filename) {
-		// This code works but needs to be made tailored to the specs in the sheet
-		/*try {
+	private void loadPrice(String filename) {try {
 			BufferedReader br = new BufferedReader(new FileReader(filename));
 			Statement s = connection.createStatement();
 			String line;
@@ -302,7 +320,11 @@ public class Driver {
 		}
 		catch (IOException e) {
 			System.out.println(e.toString());
-		}*/
+		}
+	}
+
+	private void changePrice(String departure, String arrival, int high, int low) {
+		
 	}
 
 	private void loadPlane(String filename) {
