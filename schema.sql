@@ -46,9 +46,9 @@ CREATE TABLE Flight (
     CONSTRAINT Flight_PK PRIMARY KEY (Flight_Number),
     CONSTRAINT Flight_FK_01 FOREIGN KEY (Plane_Type, Airline_ID) REFERENCES Plane(Plane_Type, Owner_ID),
     CONSTRAINT Flight_FK_02 FOREIGN KEY (Airline_ID) REFERENCES Airline(Airline_ID),
-    CONSTRAINT Departure_Arrival_Cities CHECK (Departure_City <> Arrival_City),
-    CONSTRAINT Flight_Check_01 CHECK (Departure_Time BETWEEN '0000' AND '2359'),
-    CONSTRAINT Flight_Check_02 CHECK (Arrival_Time BETWEEN '0000' AND '2359')
+    CONSTRAINT Flight_Check_01 CHECK (Departure_City <> Arrival_City),
+    CONSTRAINT Flight_Check_02 CHECK (Departure_Time BETWEEN '0000' AND '2359'),
+    CONSTRAINT Flight_Check_03 CHECK (Arrival_Time BETWEEN '0000' AND '2359')
 );
 
 CREATE TABLE Price (
@@ -76,7 +76,7 @@ CREATE TABLE Customer (
     Frequent_Miles varchar(5),
     CONSTRAINT Customer_PK PRIMARY KEY (CID),
     CONSTRAINT Customer_Check_01 CHECK (Salutation in ('Mr', 'Mrs', 'Ms')),
-    CONSTRAINT Customer_Check_02 CHECK (Frequent_Miles in ('001','002','003','004','005','006','007','008','009','010', null))
+    CONSTRAINT Customer_Check_02 CHECK (Frequent_Miles in ('00001','00002','00003','00004','00005','00006','00007','00008','00009','00010', null))
 );
 
 CREATE TABLE Reservation (
@@ -86,8 +86,8 @@ CREATE TABLE Reservation (
     Credit_Card_Num varchar(16),
     Reservation_Date date,
     Ticketed varchar(1),
-    Departure_City varchar(3),
-    Arrival_City varchar(3),
+    Start_City varchar(3),
+    End_City varchar(3),
     CONSTRAINT Reservation_PK PRIMARY KEY (Reservation_Number),
     CONSTRAINT Reservation_FK_01 FOREIGN KEY (CID) REFERENCES Customer(CID)
 );
@@ -110,28 +110,43 @@ CREATE TABLE System_Date (
 
 -- Triggers
 CREATE OR REPLACE TRIGGER adjustTicket
-AFTER UPDATE OF High_Price, Low_Price ON Price
-FOR EACH ROW
-DECLARE
-    reservationNumber varchar(5);
-    startCity varchar(3);
-    endCity varchar(3);
-BEGIN
-    IF UPDATING('low_price') THEN
-        UPDATE RESERVATION SET
-        Cost = :NEW.Low_Price
-        WHERE Start_City = :NEW.Departure_City AND End_City = :NEW.Arrival_City;
-    ELSE
-        UPDATE RESERVATION SET
-        Cost = :NEW.High_Price
-        WHERE Start_City = :NEW.Departure_City AND End_City = :NEW.Arrival_City;
-    END IF;
-    EXCEPTION WHEN NO_DATA_FOUND THEN
-        DBMS_OUTPUT.PUT_LINE('No data found');
+    AFTER UPDATE OF High_Price, Low_Price ON Price
+    FOR EACH ROW
+    BEGIN
+        IF UPDATING('Low_Price') THEN
+            UPDATE Reservation SET
+            Cost = :NEW.Low_Price
+            WHERE Start_City = :NEW.Departure_City AND End_City = :NEW.Arrival_City;
+        ELSE
+            UPDATE Reservation SET
+            Cost = :NEW.High_Price
+            WHERE Start_City = :NEW.Departure_City AND End_City = :NEW.Arrival_City;
+        END IF;
+        EXCEPTION WHEN NO_DATA_FOUND THEN
+            DBMS_OUTPUT.PUT_LINE('No data found');
 END;
 /
 
 CREATE OR REPLACE TRIGGER planeUpgrade
-AFTER INSERT ON Reservation_Detail
-FOR EACH ROW
-DECLARE
+    AFTER INSERT ON Reservation_Detail
+    FOR EACH ROW
+    DECLARE
+        ownID varchar(5);
+        smallPlaneType char(4);
+        smallPlaneCapacity int;
+        seats int;
+    BEGIN
+        SELECT COUNT(*) INTO seats FROM Reservation WHERE Reservation_Number = :NEW.Reservation_Number;
+        SELECT Plane_Type, Airline_ID INTO smallPlaneType, ownID FROM Flight WHERE Flight_Number = :NEW.Flight_Number;
+        SELECT Plane_Capacity INTO smallPlaneCapacity FROM Plane WHERE Plane_Type = smallPlaneType AND Owner_ID = ownID;
+        FOR Planes in (SELECT Plane_Type, Plane_Capacity FROM Plane WHERE Owner_ID = ownID) LOOP
+			IF Planes.Plane_Capacity > smallPlaneCapacity THEN
+				UPDATE Flight SET
+					Plane_Type = Planes.Plane_Type
+					WHERE Flight_Number = :NEW.Flight_Number;
+			END IF;
+		END LOOP;
+    EXCEPTION WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('No data found');
+END;
+/
