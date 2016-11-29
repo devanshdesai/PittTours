@@ -299,7 +299,8 @@ public class Driver {
 		}
 	}
 
-	private void loadPrice(String filename) {try {
+	private void loadPrice(String filename) {
+		try {
 			BufferedReader br = new BufferedReader(new FileReader(filename));
 			Statement s = connection.createStatement();
 			String line;
@@ -324,7 +325,14 @@ public class Driver {
 	}
 
 	private void changePrice(String departure, String arrival, int high, int low) {
-		
+		try {
+			Statement s = connection.createStatement();
+			String sql = "UPDATE Price SET High_Price = " + high + ", Low_Price = " + low + " WHERE Airline_ID = (SELECT Airline_ID FROM Price WHERE Departure_City = '" + departure + "'" + "AND Arrival_City = '" + arrival + "');";
+			s.executeUpdate(sql);
+		}
+		catch (Exception e) {
+			System.out.println(e.toString());
+		}
 	}
 
 	private void loadPlane(String filename) {
