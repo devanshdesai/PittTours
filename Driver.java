@@ -1,5 +1,9 @@
 import java.sql.*;
 import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 //import java.text.ParseException;
 
 public class Driver {
@@ -16,8 +20,8 @@ public class Driver {
 		int operation = 0;
 		String response;
 
-		if(mode == 1) {
-			while(true) {
+		if (mode == 1) {
+			while (true) {
 				System.out.println("Choose an operation: \n"
 					+ "[1] Erase the database \n"
 					+ "[2] Load airline information \n"
@@ -30,33 +34,45 @@ public class Driver {
 				switch (operation) {
 					case 1:
 						System.out.println("Are you sure you want to erase all tuples? [y/n]");
+						scan.skip("\n");
 						response = scan.nextLine();
-						if(response.equals("y")) eraseDatabase();
-						break;
+						if (response.equals("y")) {
+							eraseDatabase();
+						}
+						else {
+							System.out.println("The database was unchanged.\n");
+							break;
+						}
 					case 2:
 						System.out.println("Enter file name");
+						scan.skip("\n");
 						response = scan.nextLine();
 						loadAirline(response);
 						break;
 					case 3:
 						System.out.println("Enter file name");
+						scan.skip("\n");
 						response = scan.nextLine();
 						loadSchedule(response);
 						break;
 					case 4:
 						System.out.println("Enter file name");
+						scan.skip("\n");
 						response = scan.nextLine();
 						loadSchedule(response);
 						break;
 					case 5:
 						System.out.println("Enter file name");
+						scan.skip("\n");
 						response = scan.nextLine();
 						loadPlane(response);
 						break;
 					case 6:
 						System.out.println("Enter flight number");
+						scan.skip("\n");
 						String flight = scan.nextLine();
 						System.out.println("Enter date [MM-DD-YYYY]");
+						scan.skip("\n");
 						String date = scan.nextLine();
 						passengerManifest(flight, date);
 						break;
@@ -67,8 +83,8 @@ public class Driver {
 				}
 			}
 		}
-		else{
-			while(true) {
+		else {
+			while (true) {
 				System.out.println("Choose an operation: \n"
 					+ "[1] Add customer \n"
 					+ "[[2] Show customer info, given customer name \n"
@@ -94,49 +110,64 @@ public class Driver {
 						break;
 					case 2:
 						System.out.println("Enter customer name");
+						scan.skip("\n");
 						String name = scan.nextLine();
 						showCustomer(name);
 						break;
 					case 3:
 						System.out.println("Enter start city (eg. PIT)");
+						scan.skip("\n");
 						cityA = scan.nextLine();
 						System.out.println("Enter end city");
+						scan.skip("\n");
 						cityB = scan.nextLine();
 						findPrice(cityA, cityB);
 						break;
 					case 4:
 						System.out.println("Enter start city (eg. PIT)");
+						scan.skip("\n");
 						cityA = scan.nextLine();
 						System.out.println("Enter end city");
+						scan.skip("\n");
 						cityB = scan.nextLine();
 						routesBetweenCities(cityA, cityB);
 						break;
 					case 5:
 						System.out.println("Enter start city (eg. PIT)");
+						scan.skip("\n");
 						cityA = scan.nextLine();
 						System.out.println("Enter end city");
+						scan.skip("\n");
 						cityB = scan.nextLine();
 						System.out.println("Enter airline code (eg. AAL)");
+						scan.skip("\n");
 						airline = scan.nextLine();
 						routesBetweenCitiesOnAirline(cityA, cityB, airline);
 						break;
 					case 6:
 						System.out.println("Enter start city (eg. PIT)");
+						scan.skip("\n");
 						cityA = scan.nextLine();
 						System.out.println("Enter end city");
+						scan.skip("\n");
 						cityB = scan.nextLine();
 						System.out.println("Enter date [MM-DD-YYYY]");
+						scan.skip("\n");
 						date = scan.nextLine();
 						availableSeats(cityA, cityB, date);
 						break;
 					case 7:
 						System.out.println("Enter start city (eg. PIT)");
+						scan.skip("\n");
 						cityA = scan.nextLine();
 						System.out.println("Enter end city");
+						scan.skip("\n");
 						cityB = scan.nextLine();
 						System.out.println("Enter date [MM-DD-YYYY]");
+						scan.skip("\n");
 						date = scan.nextLine();
 						System.out.println("Enter airline code (eg. AAL)");
+						scan.skip("\n");
 						airline = scan.nextLine();
 						availableSeats(cityA, cityB, date, airline);
 						break;
@@ -145,8 +176,9 @@ public class Driver {
 						String flights[] = new String[4];
 						String dates[] = new String[4];
 
-						while(leg < 4) {
+						while (leg < 4) {
 							System.out.println("Enter flight number or [0] if you are finished");
+							scan.skip("\n");
 							String flightNumber = scan.nextLine();
 
 							if (flightNumber.equals("0")) {
@@ -155,6 +187,7 @@ public class Driver {
 
 							flights[leg] = flightNumber;
 							System.out.println("Enter date [MM-DD-YYYY]");
+							scan.skip("\n");
 							date = scan.nextLine();
 							dates[leg] = date;
 							leg++;
@@ -163,11 +196,13 @@ public class Driver {
 						break;
 					case 9:
 						System.out.println("Enter reservation number");
+						scan.skip("\n");
 						reservation = scan.nextLine();
 						showReservation(reservation);
 						break;
 					case 10:
 						System.out.println("Enter reservation number");
+						scan.skip("\n");
 						reservation = scan.nextLine();
 						buyTickets(reservation);
 						break;
@@ -175,6 +210,7 @@ public class Driver {
 						System.exit(0);
 					default:
 						System.out.println("Not a valid operation code");
+						scan.skip("\n");
 				}
 			}
 		}
@@ -193,10 +229,50 @@ public class Driver {
 		}
 	}
 	private void loadAirline(String filename) {
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(filename));
+			String line;
+			Statement s;
+			String sql;
+			String[] airline;
 
+			while ((line = br.readLine()) != null) {
+				airline = line.split(",");
+				sql = "INSERT INTO Airline VALUES('" + airline[0] + "', '" + airline[1] + "', '" + airline[2] + "', " + airline[3] + ");";
+				s.executeUpdate(sql);
+			}
+
+			System.out.println("Airlines were loaded from " + filename);
+		}
+		catch (FileNotFoundException e) {
+			System.out.println("The file was not found.\n");
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	private void loadSchedule(String filename) {
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(filename));
+			String line;
+			Statement s;
+			String sql;
+			String[] flight;
 
+			while ((line = br.readLine()) != null) {
+				flight = line.split(",");
+				sql = "INSERT INTO Flight VALUES('" + flight[0] + "', '" + flight[1] + "', '" + flight[2] + "', '" + flight[3] + "', '" + flight[4] + "', '" + flight[5] + "', '" + flight[6] + "', '" + flight[7] + "');";
+				s.executeUpdate(sql);
+			}
+
+			System.out.println("Flights were loaded from " + filename);
+		}
+		catch (FileNotFoundException e) {
+			System.out.println("The file was not found.\n");
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	private void loadPrice(String filename) {
 
