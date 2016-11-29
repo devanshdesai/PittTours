@@ -408,7 +408,39 @@ public class Driver {
 	}
 
 	private void findPrice(String cityA, String cityB) {
+		//need to add round trips
+		try {
+			Statement s = connection.createStatement();
+			String sql = "SELECT * FROM Price WHERE departure_city = '" + cityA + "' AND arrival_city = '" + cityB + "';";
+			ResultSet r = s.executeQuery(sql);
 
+			System.out.println();
+			System.out.println("Flights from " + cityA + " to " + cityB);
+			System.out.println();
+
+			while (r.next()) {
+
+		    	System.out.println("Depart: " + r.getString(1) + " Arrive: " + r.getString(2) + " Airline:" + r.getString(3) + " \n"
+			      + "High Price: " + r.getLong(4) + "Low Price: " + r.getLong(5));
+		    }
+
+		    sql = "SELECT * FROM Price WHERE departure_city = '" + cityB + "' AND arrival_city = '" + cityA + "';";
+			r = s.executeQuery(sql);
+
+			System.out.println();
+			System.out.println("Flights from " + cityB + " to " + cityA);
+			System.out.println();
+
+			while (r.next()) {
+		    	System.out.println("Depart: " + r.getString(1) + " Arrive: " + r.getString(2) + " Airline:" + r.getString(3) + " \n"
+			      + "High Price: " + r.getLong(4) + "Low Price: " + r.getLong(5));
+		    }
+
+		    r.close();
+		}
+		catch (Exception e) {
+			System.out.println(e.toString());
+		}
 	}
 
 	private void routesBetweenCities(String cityA, String cityB) {
