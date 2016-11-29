@@ -275,7 +275,27 @@ public class Driver {
 		}
 	}
 	private void loadPrice(String filename) {
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(filename));
+			String line;
+			Statement s;
+			String sql;
+			String[] price;
 
+			while ((line = br.readLine()) != null) {
+				price = line.split(",");
+				sql = "INSERT INTO Airline VALUES('" + airline[0] + "', '" + airline[1] + "', '" + airline[2] + "', " + airline[3] + ", " + airline[4]  + ");";
+				s.executeUpdate(sql);
+			}
+
+			System.out.println("Prices were loaded from " + filename);
+		}
+		catch (FileNotFoundException e) {
+			System.out.println("The file was not found.\n");
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	private void loadPlane(String filename) {
 
