@@ -250,7 +250,7 @@ public class Driver {
 			System.out.println("The file was not found.\n");
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			System.out.println(e.toString());
 		}
 	}
 
@@ -275,7 +275,7 @@ public class Driver {
 			System.out.println("The file was not found.\n");
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			System.out.println(e.toString());
 		}
 	}
 
@@ -301,7 +301,7 @@ public class Driver {
 			System.out.println("The file was not found.\n");
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			System.out.println(e.toString());
 		}*/
 	}
 
@@ -326,12 +326,20 @@ public class Driver {
 			System.out.println("The file was not found.\n");
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			System.out.println(e.toString());
 		}
 	}
 
 	private void passengerManifest(String flightNumber, String date) {
+		try {
+			Statement s = connection.createStatement();
+			String sql = "SELECT Salution, First_Name, Last_Name FROM Customer c INNER JOIN Reservation r ON c.CID = r.CID INNER JOIN Reservation_Detail rd ON r.Reservation_Number = rd.Reservation_Number WHERE rd.Flight_Number = '" + flightNumber + "' AND Flight_Date = TO_DATE('" + date + "','MM-DD-YYYY');";
+			ResultSet r = s.executeQuery(sql);
 
+		}
+		catch (Exception e) {
+			System.out.println(e.toString());
+		}
 	}
 
 	private void addCustomer(String salutation, String first, String last, String credit, String creditExpire, String street, String city, String state, String phone, String email, String freqFlyer) {
@@ -362,7 +370,7 @@ public class Driver {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			System.out.println(e.toString());
 		}
 	}
 
@@ -373,16 +381,16 @@ public class Driver {
 			ResultSet r = s.executeQuery(sql);
 
 			if (!r.first()) {
-				String cid = r.getString(1);
-				String salutation = r.getString(2);
-				String credit = r.getString(5);
-				Date creditExpire = r.getDate(6);
-				String street = r.getString(7);
-				String city = r.getString(8);
-				String state = r.getString(9);
-				String phone = r.getString(10);
-				String email = r.getString(11);
-				String freq = r.getString(12);
+				String cid = r.getString("CID");
+				String salutation = r.getString("Salutation");
+				String credit = r.getString("Credit_Card_Num");
+				Date creditExpire = r.getDate("Credit_Card_Expire");
+				String street = r.getString("Street");
+				String city = r.getString("City");
+				String state = r.getString("State");
+				String phone = r.getString("Phone");
+				String email = r.getString("Email");
+				String freq = r.getString("Frequent_Miles");
 
 				DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
 				String creditExpireStr = df.format(creditExpire);
@@ -395,7 +403,7 @@ public class Driver {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			System.out.println(e.toString());
 		}
 	}
 

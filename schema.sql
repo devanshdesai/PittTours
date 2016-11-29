@@ -150,3 +150,14 @@ CREATE OR REPLACE TRIGGER planeUpgrade
         DBMS_OUTPUT.PUT_LINE('No data found');
 END;
 /
+
+/*
+CREATE OR REPLACE VIEW Passenger_Manifest(Salutation, First_Name, Last_Name)
+AS
+    SELECT Salution, First_Name, Last_Name
+    FROM Customer c
+    INNER JOIN Reservation r
+        ON c.CID = r.CID
+    INNER JOIN Reservation_Detail rd
+        ON r.CID = rd.CID;
+*/
