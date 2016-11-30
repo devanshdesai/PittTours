@@ -478,8 +478,8 @@ public class Driver {
 	private void routesBetweenCities(String cityA, String cityB) {
 		try {
 			Statement s = connection.createStatement();
-			String sql = "SELECT Flight_number, Airline_ID, Departure_city, Arrival_City, Departure_time, Arrival_time 
-				FROM Flight WHERE departure_city = '" + cityA + "' AND arrival_city = '" + cityB + "';";
+			String sql = "SELECT Flight_number, Airline_ID, Departure_city, Arrival_City, Departure_time, Arrival_time" +   
+				"FROM Flight WHERE departure_city = '" + cityA + "' AND arrival_city = '" + cityB + "';";
 			ResultSet r = s.executeQuery(sql);
 
 			System.out.println();
@@ -495,25 +495,25 @@ public class Driver {
 			System.out.println("Flights with one connection from " + cityA + " to " + cityB);
 			System.out.println();
 
-		    sql = "SELECT f1.Flight_number, f1.Airline_ID, f1.Departure_city, f1.Arrival_City, f1.Departure_time, f1.Arrival_time, 
-		    			f2.Flight_number, f2.Airline_ID, f2.Departure_city, f2.Arrival_City, f2.Departure_time, f2.Arrival_time 
-				FROM FLIGHT f1, FLIGHT f2 
-				WHERE f1.Arrival_City = f2.Departure_city 
-				AND f1.Departure_city = '" + cityA + "' 
-				AND f2.Arrival_City = '" + cityB + "'  
-				AND (TO_NUMBER(f2.Departure_Time) - TO_NUMBER(f1.Arrival_time) > 100)
-				AND ((SUBSTR(f1.weekly_schedule, 1, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 1, 1) = 'S')
-					OR (SUBSTR(f1.weekly_schedule, 2, 1) = 'M' AND SUBSTR(f2.weekly_schedule, 2, 1) = 'M')
-					OR (SUBSTR(f1.weekly_schedule, 3, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 3, 1) = 'T')
-					OR (SUBSTR(f1.weekly_schedule, 4, 1) = 'W' AND SUBSTR(f2.weekly_schedule, 4, 1) = 'W')
-					OR (SUBSTR(f1.weekly_schedule, 5, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 5, 1) = 'T')
-					OR (SUBSTR(f1.weekly_schedule, 6, 1) = 'F' AND SUBSTR(f2.weekly_schedule, 6, 1) = 'F')
-					OR (SUBSTR(f1.weekly_schedule, 7, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 7, 1) = 'S'));";
+		    sql = "SELECT f1.Flight_number, f1.Airline_ID, f1.Departure_city, f1.Arrival_City, f1.Departure_time, f1.Arrival_time, "+
+		    			"f2.Flight_number, f2.Airline_ID, f2.Departure_city, f2.Arrival_City, f2.Departure_time, f2.Arrival_time "+
+				"FROM FLIGHT f1, FLIGHT f2 "+
+				"WHERE f1.Arrival_City = f2.Departure_city"+
+				"AND f1.Departure_city = '" + cityA + "'"+
+				"AND f2.Arrival_City = '" + cityB + "'"+
+				"AND (TO_NUMBER(f2.Departure_Time) - TO_NUMBER(f1.Arrival_time) > 100)"+
+				"AND ((SUBSTR(f1.weekly_schedule, 1, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 1, 1) = 'S')"+
+					"OR (SUBSTR(f1.weekly_schedule, 2, 1) = 'M' AND SUBSTR(f2.weekly_schedule, 2, 1) = 'M')"+
+					"OR (SUBSTR(f1.weekly_schedule, 3, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 3, 1) = 'T')"+
+					"OR (SUBSTR(f1.weekly_schedule, 4, 1) = 'W' AND SUBSTR(f2.weekly_schedule, 4, 1) = 'W')"+
+					"OR (SUBSTR(f1.weekly_schedule, 5, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 5, 1) = 'T')"+
+					"OR (SUBSTR(f1.weekly_schedule, 6, 1) = 'F' AND SUBSTR(f2.weekly_schedule, 6, 1) = 'F')"+
+					"OR (SUBSTR(f1.weekly_schedule, 7, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 7, 1) = 'S'));";
 			r = s.executeQuery(sql);
 
 			while (r.next()) {
-		    	System.out.println( r.getString(1) "\t" + r.getString(2) + r.getString(3) "\t" +r.getString(4) "\t" +r.getString(5) "\t" +r.getString(6) "\n" +
-			      r.getString(7) "\t" + r.getString(8) + r.getString(9) "\t" +r.getString(10) "\t" +r.getString(11) "\t" +r.getString(12));
+		    	System.out.println( r.getString(1) + " " + r.getString(2) + r.getString(3) + " " +r.getString(4) + " " +r.getString(5) + " " +r.getString(6) + "\n" +
+			      r.getString(7) + " " + r.getString(8) + r.getString(9) + " " +r.getString(10) + " " +r.getString(11) + " " +r.getString(12));
 		    	System.out.println();
 		    }
 
@@ -526,11 +526,11 @@ public class Driver {
 
 	private void routesBetweenCitiesOnAirline(String cityA, String cityB, String airline) {
 		Statement s = connection.createStatement();
-			String sql = "SELECT Flight_number, Airline_ID, Departure_city, Arrival_City, Departure_time, Arrival_time 
-				FROM Flight 
-				WHERE departure_city = '" + cityA + "' 
-				AND arrival_city = '" + cityB + "'
-				AND Airline_ID = '" + airline + "';";
+			String sql = "SELECT Flight_number, Airline_ID, Departure_city, Arrival_City, Departure_time, Arrival_time" +
+				"FROM Flight " +
+				"WHERE departure_city = '" + cityA + "' " +
+				"AND arrival_city = '" + cityB + "'" +
+				"AND Airline_ID = '" + airline + "';";
 			ResultSet r = s.executeQuery(sql);
 
 			System.out.println();
@@ -546,27 +546,27 @@ public class Driver {
 			System.out.println("Flights with one connection from " + cityA + " to " + cityB);
 			System.out.println();
 
-		    sql = "SELECT f1.Flight_number, f1.Airline_ID, f1.Departure_city, f1.Arrival_City, f1.Departure_time, f1.Arrival_time, 
-		    			f2.Flight_number, f2.Airline_ID, f2.Departure_city, f2.Arrival_City, f2.Departure_time, f2.Arrival_time 
-				FROM FLIGHT f1, FLIGHT f2 
-				WHERE f1.Arrival_City = f2.Departure_city 
-				AND f1.Departure_city = '" + cityA + "' 
-				AND f2.Arrival_City = '" + cityB + "'
-				AND f1.Airline_ID = '" + airline + "'
-				AND f2.Airline_ID = '" + airline + "'
-				AND (TO_NUMBER(f2.Departure_Time) - TO_NUMBER(f1.Arrival_time) > 100)
-				AND ((SUBSTR(f1.weekly_schedule, 1, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 1, 1) = 'S')
-					OR (SUBSTR(f1.weekly_schedule, 2, 1) = 'M' AND SUBSTR(f2.weekly_schedule, 2, 1) = 'M')
-					OR (SUBSTR(f1.weekly_schedule, 3, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 3, 1) = 'T')
-					OR (SUBSTR(f1.weekly_schedule, 4, 1) = 'W' AND SUBSTR(f2.weekly_schedule, 4, 1) = 'W')
-					OR (SUBSTR(f1.weekly_schedule, 5, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 5, 1) = 'T')
-					OR (SUBSTR(f1.weekly_schedule, 6, 1) = 'F' AND SUBSTR(f2.weekly_schedule, 6, 1) = 'F')
-					OR (SUBSTR(f1.weekly_schedule, 7, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 7, 1) = 'S'));";
+		    sql = "SELECT f1.Flight_number, f1.Airline_ID, f1.Departure_city, f1.Arrival_City, f1.Departure_time, f1.Arrival_time, "+
+		    			"f2.Flight_number, f2.Airline_ID, f2.Departure_city, f2.Arrival_City, f2.Departure_time, f2.Arrival_time "+
+				"FROM FLIGHT f1, FLIGHT f2 "+
+				"WHERE f1.Arrival_City = f2.Departure_city"+
+				"AND f1.Departure_city = '" + cityA + "'"+
+				"AND f2.Arrival_City = '" + cityB + "'"+
+				"AND f1.Airline_ID = '" + airline + "'" +
+				"AND f2.Airline_ID = '" + airline + "'" +
+				"AND (TO_NUMBER(f2.Departure_Time) - TO_NUMBER(f1.Arrival_time) > 100)"+
+				"AND ((SUBSTR(f1.weekly_schedule, 1, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 1, 1) = 'S')"+
+					"OR (SUBSTR(f1.weekly_schedule, 2, 1) = 'M' AND SUBSTR(f2.weekly_schedule, 2, 1) = 'M')"+
+					"OR (SUBSTR(f1.weekly_schedule, 3, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 3, 1) = 'T')"+
+					"OR (SUBSTR(f1.weekly_schedule, 4, 1) = 'W' AND SUBSTR(f2.weekly_schedule, 4, 1) = 'W')"+
+					"OR (SUBSTR(f1.weekly_schedule, 5, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 5, 1) = 'T')"+
+					"OR (SUBSTR(f1.weekly_schedule, 6, 1) = 'F' AND SUBSTR(f2.weekly_schedule, 6, 1) = 'F')"+
+					"OR (SUBSTR(f1.weekly_schedule, 7, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 7, 1) = 'S'));";
 			r = s.executeQuery(sql);
 
 			while (r.next()) {
-		    	System.out.println( r.getString(1) "\t" + r.getString(2) + r.getString(3) "\t" +r.getString(4) "\t" +r.getString(5) "\t" +r.getString(6) "\n" +
-			      r.getString(7) "\t" + r.getString(8) + r.getString(9) "\t" +r.getString(10) "\t" +r.getString(11) "\t" +r.getString(12));
+		    	System.out.println( r.getString(1) + " " + r.getString(2) + r.getString(3) + " " +r.getString(4) + " " +r.getString(5) + " " +r.getString(6) + "\n" +
+			      r.getString(7) + " " + r.getString(8) + r.getString(9) + " " +r.getString(10) + " " +r.getString(11) + " " +r.getString(12));
 		    	System.out.println();
 		    }
 
