@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 //import java.text.ParseException;
 
 public class Driver {
@@ -107,60 +109,80 @@ public class Driver {
 			while (true) {
 				System.out.println("Choose an operation: \n"
 					+ "[1] Add customer \n"
-					+ "[[2] Show customer info, given customer name \n"
-					+ "[[3] Find price for flights between two cities \n"
-					+ "[[4] Find all routes between two cities \n"
-					+ "[[5] Find all routes between two cities of a given airline \n"
-					+ "[[6] Find all routes with available seats between two cities on given day \n"
-					+ "[[7] For a given airline, find all routes with available seats between two cities on given day \n"
-					+ "[[8] Add reservation \n"
-					+ "[[9] Show reservation info, given reservation number \n"
-					+ "[[10] Buy ticket from existing reservation\n"
-					+ "[[11] Exit");
+					+ "[2] Show customer info, given customer name \n"
+					+ "[3] Find price for flights between two cities \n"
+					+ "[4] Find all routes between two cities \n"
+					+ "[5] Find all routes between two cities of a given airline \n"
+					+ "[6] Find all routes with available seats between two cities on given day \n"
+					+ "[7] For a given airline, find all routes with available seats between two cities on given day \n"
+					+ "[8] Add reservation \n"
+					+ "[9] Show reservation info, given reservation number \n"
+					+ "[10] Buy ticket from existing reservation\n"
+					+ "[11] Exit");
 				operation = scan.nextInt();
 				String cityA;
 				String cityB;
 				String date;
 				String airline;
 				String reservation;
+				String first;
+				String last;
 
 				switch (operation) {
 					case 1:
-						addCustomer();
+						System.out.println("Enter customer's salutation (Format: 'Mr', 'Mrs', or 'Ms')");
+						scan.skip("\n");
+						String salutation = scan.nextLine();
+						System.out.println("Enter customer's first name");
+						first = scan.nextLine();
+						System.out.println("Enter customer's last name");
+						last = scan.nextLine();
+						System.out.println("Enter customer's credit card number (Format: 16 digits)");
+						String cc = scan.nextLine();
+						System.out.println("Enter customer's credit card expiration date (Format: 'MM-DD-YYYY')");
+						String ccExpire = scan.nextLine();
+						System.out.println("Enter customer's street address");
+						String street = scan.nextLine();
+						System.out.println("Enter customer's city");
+						String city = scan.nextLine();
+						System.out.println("Enter customer's state (Format: PA)");
+						String state = scan.nextLine();
+						System.out.println("Enter customer's phone number (Format: 10 digits)");
+						String phone = scan.nextLine();
+						System.out.println("Enter customer's email address");
+						String email = scan.nextLine();
+						System.out.println("Enter customer's frequent miles number (if none, press [Enter])");
+						String freqMiles = scan.nextLine();
+
+						addCustomer(salutation, first, last, cc, ccExpire, street, city, state, phone, email, freqMiles);
 						break;
 					case 2:
-						System.out.println("Enter customer name");
-						scan.skip("\n");
-						String name = scan.nextLine();
-						showCustomer(name);
+						System.out.println("Enter customer first name");
+						first = scan.nextLine();
+						System.out.println("Enter customer last name");
+						last = scan.nextLine();
+						showCustomer(first, last);
 						break;
 					case 3:
 						System.out.println("Enter start city (eg. PIT)");
-						scan.skip("\n");
 						cityA = scan.nextLine();
 						System.out.println("Enter end city");
-						scan.skip("\n");
 						cityB = scan.nextLine();
 						findPrice(cityA, cityB);
 						break;
 					case 4:
 						System.out.println("Enter start city (eg. PIT)");
-						scan.skip("\n");
 						cityA = scan.nextLine();
 						System.out.println("Enter end city");
-						scan.skip("\n");
 						cityB = scan.nextLine();
 						routesBetweenCities(cityA, cityB);
 						break;
 					case 5:
 						System.out.println("Enter start city (eg. PIT)");
-						scan.skip("\n");
 						cityA = scan.nextLine();
 						System.out.println("Enter end city");
-						scan.skip("\n");
 						cityB = scan.nextLine();
 						System.out.println("Enter airline code (eg. AAL)");
-						scan.skip("\n");
 						airline = scan.nextLine();
 						routesBetweenCitiesOnAirline(cityA, cityB, airline);
 						break;
@@ -239,7 +261,7 @@ public class Driver {
 	private void eraseDatabase() {
 		try {
 			Statement s = connection.createStatement();
-			String sql = "DELETE * FROM Reservation_Detail;DELETE * FROM Reservation;DELETE * FROM Price;DELETE * FROM Customer;DELETE * FROM Flight;DELETE * FROM Plane;DELETE * FROM Airline;";
+			String sql = "DELETE * FROM Reservation_Detail;DELETE * FROM Reservation;DELETE * FROM Price;DELETE * FROM Customer;DELETE * FROM Flight;DELETE * FROM Plane;DELETE * FROM Airline";
 			s.executeUpdate(sql);
 
 			System.out.println("Database was deleted.");
@@ -259,7 +281,7 @@ public class Driver {
 
 			while ((line = br.readLine()) != null) {
 				airline = line.split(",");
-				sql = "INSERT INTO Airline VALUES('" + airline[0] + "', '" + airline[1] + "', '" + airline[2] + "', " + airline[3] + ");";
+				sql = "INSERT INTO Airline VALUES('" + airline[0] + "', '" + airline[1] + "', '" + airline[2] + "', " + airline[3] + ")";
 				s.executeUpdate(sql);
 			}
 
@@ -271,6 +293,9 @@ public class Driver {
 		}
 		catch (IOException e) {
 			System.out.println(e.toString());
+		}
+		catch(SQLException e) {
+			System.out.println("SQL Error: " + e.getMessage());
 		}
 	}
 
@@ -284,7 +309,7 @@ public class Driver {
 
 			while ((line = br.readLine()) != null) {
 				flight = line.split(",");
-				sql = "INSERT INTO Flight VALUES('" + flight[0] + "', '" + flight[1] + "', '" + flight[2] + "', '" + flight[3] + "', '" + flight[4] + "', '" + flight[5] + "', '" + flight[6] + "', '" + flight[7] + "');";
+				sql = "INSERT INTO Flight VALUES('" + flight[0] + "', '" + flight[1] + "', '" + flight[2] + "', '" + flight[3] + "', '" + flight[4] + "', '" + flight[5] + "', '" + flight[6] + "', '" + flight[7] + "')";
 				s.executeUpdate(sql);
 			}
 
@@ -296,6 +321,9 @@ public class Driver {
 		}
 		catch (IOException e) {
 			System.out.println(e.toString());
+		}
+		catch(SQLException e) {
+			System.out.println("SQL Error: " + e.getMessage());
 		}
 	}
 
@@ -309,7 +337,7 @@ public class Driver {
 
 			while ((line = br.readLine()) != null) {
 				price = line.split(",");
-				sql = "INSERT INTO Price VALUES('" + airline[0] + "', '" + airline[1] + "', '" + airline[2] + "', " + airline[3] + ", " + airline[4]  + ");";
+				sql = "INSERT INTO Price VALUES('" + price[0] + "', '" + price[1] + "', '" + price[2] + "', " + price[3] + ", " + price[4]  + ")";
 				s.executeUpdate(sql);
 			}
 
@@ -322,12 +350,15 @@ public class Driver {
 		catch (IOException e) {
 			System.out.println(e.toString());
 		}
+		catch(SQLException e) {
+			System.out.println("SQL Error: " + e.getMessage());
+		}
 	}
 
 	private void changePrice(String departure, String arrival, int high, int low) {
 		try {
 			Statement s = connection.createStatement();
-			String sql = "UPDATE Price SET High_Price = " + high + ", Low_Price = " + low + " WHERE Airline_ID = (SELECT Airline_ID FROM Price WHERE Departure_City = '" + departure + "'" + "AND Arrival_City = '" + arrival + "');";
+			String sql = "UPDATE Price SET High_Price = " + high + ", Low_Price = " + low + " WHERE Airline_ID = (SELECT Airline_ID FROM Price WHERE Departure_City = '" + departure + "'" + "AND Arrival_City = '" + arrival + "')";
 			s.executeUpdate(sql);
 		}
 		catch (Exception e) {
@@ -358,12 +389,15 @@ public class Driver {
 		catch (IOException e) {
 			System.out.println(e.toString());
 		}
+		catch(SQLException e) {
+			System.out.println("SQL Error: " + e.getMessage());
+		}
 	}
 
 	private void passengerManifest(String flightNumber, String date) {
 		try {
 			Statement s = connection.createStatement();
-			String sql = "SELECT Salution, First_Name, Last_Name FROM Customer c INNER JOIN Reservation r ON c.CID = r.CID INNER JOIN Reservation_Detail rd ON r.Reservation_Number = rd.Reservation_Number WHERE rd.Flight_Number = '" + flightNumber + "' AND Flight_Date = TO_DATE('" + date + "','MM-DD-YYYY');";
+			String sql = "SELECT Salution, First_Name, Last_Name FROM Customer c INNER JOIN Reservation r ON c.CID = r.CID INNER JOIN Reservation_Detail rd ON r.Reservation_Number = rd.Reservation_Number WHERE rd.Flight_Number = '" + flightNumber + "' AND Flight_Date = TO_DATE('" + date + "','MM-DD-YYYY')";
 			ResultSet r = s.executeQuery(sql);
 
 			do {
@@ -378,26 +412,28 @@ public class Driver {
 	private void addCustomer(String salutation, String first, String last, String credit, String creditExpire, String street, String city, String state, String phone, String email, String freqFlyer) {
 		try {
 			Statement s = connection.createStatement();
-			String sql = "SELECT COUNT(*) FROM Customer WHERE First_Name = '" + first + "' AND Last_Name = '" + last + "';";
+			String sql = "SELECT COUNT(*) FROM Customer WHERE First_Name = '" + first + "' AND Last_Name = '" + last + "'";
 			ResultSet r = s.executeQuery(sql);
+			r.next();
 			int count = r.getInt(1);
+			int currentCID;
 
 			if (count > 0) {
 				System.out.println("Customer was not added. There is already a person with the same first and last name in the database.\n");
 			}
 			else {
-				sql = "SELECT MAX(CID) FROM Customer;";
+				sql = "SELECT MAX(CID) FROM Customer";
 				r = s.executeQuery(sql);
 				String lastCID = r.getString(1);
 				if (lastCID == null) {
-					int currentCID = 1;
+					currentCID = 1;
 				}
 				else {
-					int currentCID = Integer.parseInt(lastCID) + 1;
+					currentCID = Integer.parseInt(lastCID) + 1;
 				}
 
-				sql = "INSERT INTO CUSTOMER VALUES('" + currentCID + "', '" + salutation + "', '" + first + "', '" + last + "', '" + credit +  + "', TO_DATE('"
-				+ creditExpire + "','MM-DD-YYYY'), '" + street + "', '" + city  + "', '" + state + "', '" + phone + "', '" + email + "', '" + freqMiles;
+				sql = "INSERT INTO CUSTOMER VALUES('" + currentCID + "', '" + salutation + "', '" + first + "', '" + last + "', '" + credit + "', TO_DATE('"
+				+ creditExpire + "','MM-DD-YYYY'), '" + street + "', '" + city  + "', '" + state + "', '" + phone + "', '" + email + "', '" + freqFlyer + "')";
 				s.executeQuery(sql);
 				System.out.println("Customer was successfully added.\n");
 			}
@@ -410,7 +446,7 @@ public class Driver {
 	private void showCustomer(String first, String last) {
 		try {
 			Statement s = connection.createStatement();
-			String sql = "SELECT * FROM Customer WHERE First_Name = '" + first + "' AND Last_Name = '" + last + "';";
+			String sql = "SELECT * FROM Customer WHERE First_Name = '" + first + "' AND Last_Name = '" + last + "'";
 			ResultSet r = s.executeQuery(sql);
 
 			if (!r.first()) {
@@ -595,10 +631,10 @@ public class Driver {
 
 
 	public static void main(String args[]) throws SQLException {
-		String username = "kwz5";
-		String password = "asdfj";
+		String username = "dmd113";
+		String password = "1234";
 
-		try{
+		try {
 
 			DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
 		  	String url = "jdbc:oracle:thin:@class3.cs.pitt.edu:1521:dbclass";
@@ -606,12 +642,10 @@ public class Driver {
 			connection = DriverManager.getConnection(url, username, password);
 			Driver driver = new Driver();
 		}
-		catch(Exception Ex)  {
-			System.out.println("Error connecting to database.  Machine Error: " +
-				Ex.toString());
+		catch(Exception Ex) {
+			System.out.println("Error connecting to database.  Machine Error: " + Ex.toString());
 		}
-		finally
-		{
+		finally {
 			connection.close();
 		}
 	}
