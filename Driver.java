@@ -561,6 +561,8 @@ public class Driver {
 	}
 
 	private void routesBetweenCitiesOnAirline(String cityA, String cityB, String airline) {
+		try {
+
 		Statement s = connection.createStatement();
 			String sql = "SELECT Flight_number, Airline_ID, Departure_city, Arrival_City, Departure_time, Arrival_time" +
 				"FROM Flight " +
@@ -607,6 +609,10 @@ public class Driver {
 		    }
 
 		    r.close();
+		}
+		catch (Exception e) {
+			System.out.println(e.toString());
+		}
 	}
 
 	private void availableSeats(String cityA, String cityB, String date) {
