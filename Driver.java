@@ -261,7 +261,19 @@ public class Driver {
 	private void eraseDatabase() {
 		try {
 			Statement s = connection.createStatement();
-			String sql = "DELETE * FROM Reservation_Detail;DELETE * FROM Reservation;DELETE * FROM Price;DELETE * FROM Customer;DELETE * FROM Flight;DELETE * FROM Plane;DELETE * FROM Airline";
+			String sql = "DELETE FROM Reservation_Detail";
+			s.executeUpdate(sql);
+			sql = "DELETE FROM Reservation";
+			s.executeUpdate(sql);
+			sql = "DELETE FROM Price";
+			s.executeUpdate(sql);
+			sql = "DELETE FROM Customer";
+			s.executeUpdate(sql);
+			sql = "DELETE FROM Flight";
+			s.executeUpdate(sql);
+			sql = "DELETE FROM Plane";
+			s.executeUpdate(sql);
+			sql = "DELETE FROM Airline";
 			s.executeUpdate(sql);
 
 			System.out.println("Database was deleted.");
@@ -514,7 +526,7 @@ public class Driver {
 	private void routesBetweenCities(String cityA, String cityB) {
 		try {
 			Statement s = connection.createStatement();
-			String sql = "SELECT Flight_number, Airline_ID, Departure_city, Arrival_City, Departure_time, Arrival_time" +   
+			String sql = "SELECT Flight_number, Airline_ID, Departure_city, Arrival_City, Departure_time, Arrival_time" +
 				"FROM Flight WHERE departure_city = '" + cityA + "' AND arrival_city = '" + cityB + "';";
 			ResultSet r = s.executeQuery(sql);
 
