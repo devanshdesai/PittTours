@@ -43,9 +43,10 @@ public class Driver {
 						}
 						else {
 							System.out.println("The database was unchanged.\n");
-							break;
 						}
+						break;
 					case 2:
+						System.out.println("Here");
 						System.out.println("Enter file name");
 						scan.skip("\n");
 						response = scan.nextLine();
@@ -158,6 +159,7 @@ public class Driver {
 						break;
 					case 2:
 						System.out.println("Enter customer first name");
+						scan.skip("\n");
 						first = scan.nextLine();
 						System.out.println("Enter customer last name");
 						last = scan.nextLine();
@@ -436,7 +438,9 @@ public class Driver {
 			else {
 				sql = "SELECT MAX(CID) FROM Customer";
 				r = s.executeQuery(sql);
+				r.next();
 				String lastCID = r.getString(1);
+
 				if (lastCID == null) {
 					currentCID = 1;
 				}
@@ -460,28 +464,23 @@ public class Driver {
 			Statement s = connection.createStatement();
 			String sql = "SELECT * FROM Customer WHERE First_Name = '" + first + "' AND Last_Name = '" + last + "'";
 			ResultSet r = s.executeQuery(sql);
+			r.next();
+			String cid = r.getString("CID");
+			String salutation = r.getString("Salutation");
+			String credit = r.getString("Credit_Card_Num");
+			Date creditExpire = r.getDate("Credit_Card_Expire");
+			String street = r.getString("Street");
+			String city = r.getString("City");
+			String state = r.getString("State");
+			String phone = r.getString("Phone");
+			String email = r.getString("Email");
+			String freq = r.getString("Frequent_Miles");
 
-			if (!r.first()) {
-				String cid = r.getString("CID");
-				String salutation = r.getString("Salutation");
-				String credit = r.getString("Credit_Card_Num");
-				Date creditExpire = r.getDate("Credit_Card_Expire");
-				String street = r.getString("Street");
-				String city = r.getString("City");
-				String state = r.getString("State");
-				String phone = r.getString("Phone");
-				String email = r.getString("Email");
-				String freq = r.getString("Frequent_Miles");
+			DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+			String creditExpireStr = df.format(creditExpire);
 
-				DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
-				String creditExpireStr = df.format(creditExpire);
-
-				System.out.println(salutation + ". " + first + " " + last + "\n" + email + "\n" + phone + "\n" + street + "\n" + city + ", " + state
-				+ "\n" + credit + "\n" + creditExpireStr + "\n" + "PittRewards #: " + cid + "\nFrequent Flyer #: " + freq + "\n");
-			}
-			else {
-				System.out.println(first + " " + last + "was not found in the database.\n");
-			}
+			System.out.println("\n" + salutation + ". " + first + " " + last + "\n" + email + "\n" + phone + "\n" + street + "\n" + city + ", " + state
+			+ "\n" + credit + "\n" + creditExpireStr + "\n" + "PittRewards #: " + cid + "\nFrequent Flyer #: " + freq + "\n");
 		}
 		catch (Exception e) {
 			System.out.println(e.toString());
