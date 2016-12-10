@@ -107,7 +107,8 @@ public class Driver {
 						return;
 					case 8:
 						System.exit(0);
-					case 12:
+					case 100:
+						// This hidden key will load all the tuples into the database.
 						loadAll();
 						break;
 					default:
@@ -307,16 +308,16 @@ public class Driver {
 
 			for (int i = 0; i < allCSV.length; i++) {
 				String name = allCSV[i].getName();
-				if (name.equals("airline.csv")) {
+				if (name.equals("01airline.csv")) {
 					loadAirline(name);
 				}
-				else if (name.equals("flight.csv")) {
-					loadSchedule(name);
-				}
-				else if (name.equals("plane.csv")) {
+				else if (name.equals("02plane.csv")) {
 					loadPlane(name);
 				}
-				else if (name.equals("price.csv")) {
+				else if (name.equals("03flight.csv")) {
+					loadSchedule(name);
+				}
+				else if (name.equals("04price.csv")) {
 					loadPrice(name);
 				}
 			}
@@ -431,7 +432,7 @@ public class Driver {
 
 			while ((line = br.readLine()) != null) {
 				plane = line.split(",");
-				sql = "INSERT INTO Plane VALUES('" + plane[0] + "', '" + plane[1] + "', " + plane[2] + ", TO_DATE('" + plane[3] + "', 'MM_DD-YYY'), " + plane[4]  + ", '" + plane[5] + "');";
+				sql = "INSERT INTO Plane VALUES('" + plane[0] + "', '" + plane[1] + "', " + plane[2] + ", TO_DATE('" + plane[3] + "', 'MM-DD-YYYY'), " + plane[4]  + ", '" + plane[5] + "')";
 				s.executeUpdate(sql);
 			}
 
