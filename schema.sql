@@ -150,3 +150,24 @@ CREATE OR REPLACE TRIGGER planeUpgrade
         DBMS_OUTPUT.PUT_LINE('No data found');
 END;
 /
+
+create or replace function capacity(FN in varchar2) 
+    return number is
+    lim number;
+begin
+    select Plane.plane_capacity into lim from Plane 
+    JOIN Flight ON Plane.Plane_type = Flight.Plane_type
+    WHERE Flight.flight_number = FN;
+    return (lim);
+end;
+/
+
+create or replace function reserved(FN in varchar2, DT in date) 
+    return number is
+    ct number;
+begin
+    select COUNT(*) into ct from Reservation_Detail 
+    WHERE flight_number = FN AND flight_date = DT;
+    return (ct);
+end;
+/
