@@ -240,7 +240,7 @@ public class Driver {
 						scan.skip("\n");
 						while (leg < 4) {
 							System.out.println("Enter flight number or [0] if you are finished");
-							
+
 							String flightNumber = scan.nextLine();
 							if (flightNumber.equals("0")) {
 								break;
@@ -250,9 +250,9 @@ public class Driver {
 							System.out.println("Enter date [MM-DD-YYYY]");
 							date = scan.nextLine();
 
-							if(full(flightNumber,date)) 
+							if(full(flightNumber,date))
 								break;
-							
+
 							dates[leg] = date;
 							leg++;
 						}
@@ -283,7 +283,7 @@ public class Driver {
 	private boolean full(String flight, String date){
 		try {
 			Statement s = connection.createStatement();
-			String sql = "SELECT capacity('"+flight+"') FROM flight WHERE flight_number = " + flight; 
+			String sql = "SELECT capacity('"+flight+"') FROM flight WHERE flight_number = " + flight;
 			ResultSet r = s.executeQuery(sql);
 			r.next();
 			int capacity = r.getInt(1);
@@ -294,8 +294,8 @@ public class Driver {
 			if(capacity == reserved) {
 				System.out.println("This flight is full");
 				return true;
-			} 
-				
+			}
+
 			return false;
 		}
 		catch (Exception e) {
@@ -572,23 +572,23 @@ public class Driver {
 			Statement s = connection.createStatement();
 			String sql = "SELECT * FROM Price p INNER JOIN Airline a ON p.Airline_ID = a.Airline_ID WHERE p.Departure_City = '" + cityA + "' AND p.Arrival_City = '" + cityB + "'";
 			ResultSet r = s.executeQuery(sql);
-			System.out.println("\n\nOne-way flights from " + cityA + " to " + cityB);
+			System.out.println("\n\nOne-way flights from " + cityA + " to " + cityB + ":");
 			while (r.next()) {
-		    	System.out.println("  Depart: " + r.getString("Departure_City") + "  Arrive: " + r.getString("Arrival_City") + "  Airline: " + r.getString("Airline_Name") + " \n"
+		    	System.out.println("  Departure City: " + r.getString("Departure_City") + "  Arrival City: " + r.getString("Arrival_City") + "  Airline: " + r.getString("Airline_Name") + " \n"
 			      + "    High Price: " + r.getLong("High_Price") + "  Low Price: " + r.getLong("Low_Price"));
 		    }
 
 		    sql = "SELECT * FROM Price p INNER JOIN Airline a ON p.Airline_ID = a.Airline_ID WHERE p.Departure_City = '" + cityB + "' AND p.Arrival_City = '" + cityA + "'";
 			r = s.executeQuery(sql);
-			System.out.println("\n\nOne-way flights from " + cityB + " to " + cityA);
+			System.out.println("\n\nOne-way flights from " + cityB + " to " + cityA + ":");
 			while (r.next()) {
-		    	System.out.println("  Depart: " + r.getString("Departure_City") + "  Arrive: " + r.getString("Arrival_City") + "  Airline: " + r.getString("Airline_Name") + " \n"
+		    	System.out.println("  Departure City: " + r.getString("Departure_City") + "  Arrival City: " + r.getString("Arrival_City") + "  Airline: " + r.getString("Airline_Name") + " \n"
 			      + "    High Price: " + r.getLong("High_Price") + "  Low Price: " + r.getLong("Low_Price"));
 		    }
 
 			sql = "SELECT * FROM Airline a INNER JOIN (SELECT Airline_ID, SUM(High_Price) AS High, SUM(Low_Price) AS Low FROM Price p WHERE Departure_City = '" + cityA + "' AND Arrival_City = '" + cityB + "' OR Departure_City = '" + cityB + "' AND Arrival_City = '" + cityA + "' GROUP BY Airline_ID) p ON a.Airline_ID = p.Airline_ID";
 			r = s.executeQuery(sql);
-			System.out.println("\n\nRound-trip flights between " + cityA + " to " + cityB);
+			System.out.println("\n\nRound-trip flights between " + cityA + " to " + cityB + ":");
 			while (r.next()) {
 				System.out.println("  Airline: " + r.getString("Airline_Name") + " \n" + "    High Price: " + r.getLong("High") + "  Low Price: " + r.getLong("Low"));
 			}
@@ -604,41 +604,38 @@ public class Driver {
 		try {
 			Statement s = connection.createStatement();
 			String sql = "SELECT Flight_number, Airline_ID, Departure_city, Arrival_City, Departure_time, Arrival_time " +
-				"FROM Flight WHERE departure_city = '" + cityA + "' AND arrival_city = '" + cityB + "';";
+				"FROM Flight WHERE Departure_City = '" + cityA + "' AND Arrival_City = '" + cityB + "'";
+
 			ResultSet r = s.executeQuery(sql);
 
-			System.out.println("\nDirect flights from " + cityA + " to " + cityB);
-
+			System.out.println("\nDirect flights from " + cityA + " to " + cityB + ":");
 			while (r.next()) {
 		    	System.out.println("  Flight Number: " + r.getString(1) + " Airline: " + r.getString(2) + " \n"
 			      + "    Depart: " + r.getString(3) + " Arrive " + r.getString(4) + " Depart Time: " + r.getString(5) + " Arrive Time: " + r.getString(6));
 		    }
 
-		    System.out.println();
-			System.out.println("Flights with one connection from " + cityA + " to " + cityB);
-			System.out.println();
+			System.out.println("\nFlights with one connection from " + cityA + " to " + cityB + ":");
 
-		    sql = "SELECT f1.Flight_number, f1.Airline_ID, f1.Departure_city, f1.Arrival_City, f1.Departure_time, f1.Arrival_time, "+
-		    			"f2.Flight_number, f2.Airline_ID, f2.Departure_city, f2.Arrival_City, f2.Departure_time, f2.Arrival_time "+
-				"FROM FLIGHT f1, FLIGHT f2 "+
-				"WHERE f1.Arrival_City = f2.Departure_city"+
-				"AND f1.Departure_city = '" + cityA + "'"+
-				"AND f2.Arrival_City = '" + cityB + "'"+
-				"AND (TO_NUMBER(f2.Departure_Time) - TO_NUMBER(f1.Arrival_time) > 100)"+
-				"AND ((SUBSTR(f1.weekly_schedule, 1, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 1, 1) = 'S')"+
-					"OR (SUBSTR(f1.weekly_schedule, 2, 1) = 'M' AND SUBSTR(f2.weekly_schedule, 2, 1) = 'M')"+
-					"OR (SUBSTR(f1.weekly_schedule, 3, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 3, 1) = 'T')"+
-					"OR (SUBSTR(f1.weekly_schedule, 4, 1) = 'W' AND SUBSTR(f2.weekly_schedule, 4, 1) = 'W')"+
-					"OR (SUBSTR(f1.weekly_schedule, 5, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 5, 1) = 'T')"+
-					"OR (SUBSTR(f1.weekly_schedule, 6, 1) = 'F' AND SUBSTR(f2.weekly_schedule, 6, 1) = 'F')"+
-					"OR (SUBSTR(f1.weekly_schedule, 7, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 7, 1) = 'S'));";
+		    sql = "SELECT f1.Flight_number, f1.Airline_ID, f1.Departure_city, f1.Arrival_City, f1.Departure_time, f1.Arrival_time, " +
+		    			"f2.Flight_number, f2.Airline_ID, f2.Departure_city, f2.Arrival_City, f2.Departure_time, f2.Arrival_time " +
+				"FROM FLIGHT f1, FLIGHT f2 " +
+				"WHERE f1.Arrival_City = f2.Departure_city " +
+				"AND f1.Departure_city = '" + cityA + "' " +
+				"AND f2.Arrival_City = '" + cityB + "' " +
+				"AND (TO_NUMBER(f2.Departure_Time) - TO_NUMBER(f1.Arrival_time) > 100) " +
+				"AND ((SUBSTR(f1.weekly_schedule, 1, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 1, 1) = 'S') " +
+					"OR (SUBSTR(f1.weekly_schedule, 2, 1) = 'M' AND SUBSTR(f2.weekly_schedule, 2, 1) = 'M') " +
+					"OR (SUBSTR(f1.weekly_schedule, 3, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 3, 1) = 'T') " +
+					"OR (SUBSTR(f1.weekly_schedule, 4, 1) = 'W' AND SUBSTR(f2.weekly_schedule, 4, 1) = 'W') " +
+					"OR (SUBSTR(f1.weekly_schedule, 5, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 5, 1) = 'T') " +
+					"OR (SUBSTR(f1.weekly_schedule, 6, 1) = 'F' AND SUBSTR(f2.weekly_schedule, 6, 1) = 'F') " +
+					"OR (SUBSTR(f1.weekly_schedule, 7, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 7, 1) = 'S'))";
 			r = s.executeQuery(sql);
 
 			while (r.next()) {
-		    	System.out.println( r.getString(1) + " " + r.getString(2) + r.getString(3) + " " +r.getString(4) + " " +r.getString(5) + " " +r.getString(6) + "\n" +
-			      r.getString(7) + " " + r.getString(8) + r.getString(9) + " " +r.getString(10) + " " +r.getString(11) + " " +r.getString(12));
-		    	System.out.println();
-		    }
+				System.out.println("  Flight No: " + r.getString(1) + "  Airline ID: " + r.getString(2) + "  Departure City: " + r.getString(3) + "  Arrival City: " + r.getString(4) + "  Departure Time: " + r.getString(5) + "  Arrival Time: " + r.getString(6) + "\n" +
+			      "  Flight No: " + r.getString(7) + "  Airline ID: " + r.getString(8) + "  Departure City: " + r.getString(9) + "  Arrival City: " + r.getString(10) + "  Departure Time: " + r.getString(11) + "  Arrival Time: " + r.getString(12) + "\n");
+			}
 
 		    r.close();
 		}
@@ -655,30 +652,35 @@ public class Driver {
 				"FROM Flight " +
 				"WHERE departure_city = '" + cityA + "' " +
 				"AND arrival_city = '" + cityB + "' " +
+<<<<<<< HEAD
 				"AND Airline_Abbreviation = '" + airline_abbreviation + "';";
+=======
+				"AND Airline_ID = '" + airline + "'";
+>>>>>>> e8c0f8e3f60002919b3461f9ee417ca3722e25a4
 			ResultSet r = s.executeQuery(sql);
 
-			System.out.println();
-			System.out.println("Direct flights from " + cityA + " to " + cityB);
-			System.out.println();
+			System.out.println("\nDirect flights from " + cityA + " to " + cityB + ":");
 
 			while (r.next()) {
-		    	System.out.println("Flight Number: " + r.getString(1) + " Airline: " + r.getString(2) + " \n"
-			      + "Depart: " + r.getString(3) + " Arrive " + r.getString(4) + " Depart Time: " + r.getString(5) + " Arrive Time: " + r.getString(6));
+		    	System.out.println("  Flight No: " + r.getString(1) + "  Airline ID: " + r.getString(2) + " \n"
+			      + "     Departure City: " + r.getString(3) + "  Arrival City: " + r.getString(4) + "  Departaure Time: " + r.getString(5) + "  Arrival Time: " + r.getString(6));
 		    }
 
-		    System.out.println();
-			System.out.println("Flights with one connection from " + cityA + " to " + cityB);
-			System.out.println();
+			System.out.println("\nFlights with one connection from " + cityA + " to " + cityB + ":");
 
-		    sql = "SELECT f1.Flight_number, f1.Airline_ID, f1.Departure_city, f1.Arrival_City, f1.Departure_time, f1.Arrival_time, "+
-		    			"f2.Flight_number, f2.Airline_ID, f2.Departure_city, f2.Arrival_City, f2.Departure_time, f2.Arrival_time "+
+		    sql = "SELECT f1.Flight_Number, f1.Airline_ID, f1.Departure_City, f1.Arrival_City, f1.Departure_Time, f1.Arrival_Time, "+
+		    			"f2.Flight_Number, f2.Airline_ID, f2.Departure_City, f2.Arrival_City, f2.Departure_Time, f2.Arrival_Time "+
 				"FROM FLIGHT f1, FLIGHT f2 "+
 				"WHERE f1.Arrival_City = f2.Departure_city "+
 				"AND f1.Departure_city = '" + cityA + "' "+
 				"AND f2.Arrival_City = '" + cityB + "' "+
+<<<<<<< HEAD
 				"AND f1.Airline_Abbreviation = '" + airline_abbreviation + "' " +
 				"AND f2.Airline_Abbreviation = '" + airline_abbreviation + "' " +
+=======
+				"AND f1.Airline_ID = '" + airline + "' " +
+				"AND f2.Airline_ID = '" + airline + "' " +
+>>>>>>> e8c0f8e3f60002919b3461f9ee417ca3722e25a4
 				"AND (TO_NUMBER(f2.Departure_Time) - TO_NUMBER(f1.Arrival_time) > 100) "+
 				"AND ((SUBSTR(f1.weekly_schedule, 1, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 1, 1) = 'S') "+
 					"OR (SUBSTR(f1.weekly_schedule, 2, 1) = 'M' AND SUBSTR(f2.weekly_schedule, 2, 1) = 'M') "+
@@ -686,14 +688,17 @@ public class Driver {
 					"OR (SUBSTR(f1.weekly_schedule, 4, 1) = 'W' AND SUBSTR(f2.weekly_schedule, 4, 1) = 'W') "+
 					"OR (SUBSTR(f1.weekly_schedule, 5, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 5, 1) = 'T') "+
 					"OR (SUBSTR(f1.weekly_schedule, 6, 1) = 'F' AND SUBSTR(f2.weekly_schedule, 6, 1) = 'F') "+
+<<<<<<< HEAD
 					"OR (SUBSTR(f1.weekly_schedule, 7, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 7, 1) = 'S'));";
+=======
+					"OR (SUBSTR(f1.weekly_schedule, 7, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 7, 1) = 'S'))";
+>>>>>>> e8c0f8e3f60002919b3461f9ee417ca3722e25a4
 			r = s.executeQuery(sql);
 
 			while (r.next()) {
-		    	System.out.println( r.getString(1) + " " + r.getString(2) + r.getString(3) + " " +r.getString(4) + " " +r.getString(5) + " " +r.getString(6) + "\n" +
-			      r.getString(7) + " " + r.getString(8) + r.getString(9) + " " +r.getString(10) + " " +r.getString(11) + " " +r.getString(12));
-		    	System.out.println();
-		    }
+				System.out.println("  Flight No: " + r.getString(1) + "  Airline ID: " + r.getString(2) + "  Departure City: " + r.getString(3) + "  Arrival City: " + r.getString(4) + "  Departure Time: " + r.getString(5) + "  Arrival Time: " + r.getString(6) + "\n" +
+			      "  Flight No: " + r.getString(7) + "  Airline ID: " + r.getString(8) + "  Departure City: " + r.getString(9) + "  Arrival City: " + r.getString(10) + "  Departure Time: " + r.getString(11) + "  Arrival Time: " + r.getString(12) + "\n");
+			}
 
 		    r.close();
 		}
@@ -808,7 +813,7 @@ public class Driver {
 		}
 	}
 
-	private void addReservation(String flights[], String dates[]) { 
+	private void addReservation(String flights[], String dates[]) {
 	//asks the user for name and populates the reservation info with the customer's information
 	//determines high and low prices based on today's date: reservation date is today
 		try {
@@ -824,8 +829,8 @@ public class Driver {
 			ResultSet r = s.executeQuery(sql);
 
 			//check if customer exists
-			if (!r.isBeforeFirst() ) {    
-    			System.out.println("Customer not found. Please sign up as a customer"); 
+			if (!r.isBeforeFirst() ) {
+    			System.out.println("Customer not found. Please sign up as a customer");
     			return;
 			}
 
@@ -874,7 +879,7 @@ public class Driver {
 
 					sql = "SELECT Low_Price FROM Price WHERE Departure_city = '" + d_city + "' AND Arrival_City = '" + a_city + "' AND Airline_ID = '"+ airline + "'";
 				}
-				
+
 				r = s.executeQuery(sql);
 				r.next();
 				int priceOfFlight = r.getInt("1");
@@ -904,8 +909,8 @@ public class Driver {
 				sql = "INSERT INTO Reservation_Detail VALUES('" + res_num + "', '"+ flights[i] + "', '" + dates[i] + "', " + Integer.toString(i) + ")";
 				s.executeUpdate(sql);
 			}
-			
-			sql = "INSERT INTO Reservation VALUES('" + res_num + "', " + cid + "', " + Integer.toString(totalPrice) + ", '" + credit + "', TO_DATE('"+ today +"', 'MM-DD-YYYY')," + 
+
+			sql = "INSERT INTO Reservation VALUES('" + res_num + "', " + cid + "', " + Integer.toString(totalPrice) + ", '" + credit + "', TO_DATE('"+ today +"', 'MM-DD-YYYY')," +
 				"'N', '" + departure_city + "', '"+ arrival_city + "')";
 			s.executeUpdate(sql);
 
@@ -925,8 +930,8 @@ public class Driver {
 			ResultSet r = s.executeQuery(sql);
 
 			//check if reservation exists
-			if (!r.isBeforeFirst() ) {    
-    			System.out.println("Reservation number not found"); 
+			if (!r.isBeforeFirst() ) {
+    			System.out.println("Reservation number not found");
     			return;
 			}
 
@@ -942,7 +947,7 @@ public class Driver {
 			DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
 			String res_date = df.format(dt);
 
-			System.out.println("\n" + res_num + "\n" + cid + "\n" + credit + "\n" + Integer.toString(cost) + "\n" + res_date + "\n" + 
+			System.out.println("\n" + res_num + "\n" + cid + "\n" + credit + "\n" + Integer.toString(cost) + "\n" + res_date + "\n" +
 			"\n Ticketed: " + ticket + "\n" + start + " to " + end);
 		}
 		catch(Exception e) {
@@ -958,8 +963,8 @@ public class Driver {
 			ResultSet r = s.executeQuery(sql);
 
 			//check if reservation exists
-			if (!r.isBeforeFirst() ) {    
-    			System.out.println("Reservation number not found"); 
+			if (!r.isBeforeFirst() ) {
+    			System.out.println("Reservation number not found");
     			return;
 			}
 
@@ -967,22 +972,22 @@ public class Driver {
 			String ccn = r.getString("Credit_Card_Num");
 			boolean newCCN = false;
 			if(ccn != null && ccn.length() == 16) {
-    			System.out.println("Would you like to use the credit card associated with your account? [y/n]"); 
+    			System.out.println("Would you like to use the credit card associated with your account? [y/n]");
     			String response = scan.nextLine();
-    			if(response.equals("y")) newCCN = true; 
-			} 
+    			if(response.equals("y")) newCCN = true;
+			}
 			//change credit card number
 			if(!newCCN) {
 				String newNumber;
 				while(true) {
-					System.out.println("Input your 16 digit credit card number"); 
+					System.out.println("Input your 16 digit credit card number");
     				newNumber = scan.nextLine();
     				if(newNumber.length() == 16) break;
-					System.out.println("Invalid format"); 
+					System.out.println("Invalid format");
 				}
 				sql = "UPDATE Reservation Set Credit_Card_Num = '" + newNumber + "' WHERE Reservation_Number = '" + reservation_number + "'";
 				s.executeUpdate(sql);
-				System.out.println("Updated credit card number"); 
+				System.out.println("Updated credit card number");
 			}
 
 			sql = "UPDATE Reservation Set Ticketed = 'Y' WHERE Reservation_Number = '" + reservation_number + "'";
