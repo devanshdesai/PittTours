@@ -672,8 +672,6 @@ public class Driver {
 				"AND f2.Arrival_City = '" + cityB + "' "+
 				"AND f1.Airline_Abbreviation = '" + airline_abbreviation + "' " +
 				"AND f2.Airline_Abbreviation = '" + airline_abbreviation + "' " +
-				"AND f1.Airline_ID = '" + airline + "' " +
-				"AND f2.Airline_ID = '" + airline + "' " +
 				"AND (TO_NUMBER(f2.Departure_Time) - TO_NUMBER(f1.Arrival_time) > 100) "+
 				"AND ((SUBSTR(f1.weekly_schedule, 1, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 1, 1) = 'S') "+
 					"OR (SUBSTR(f1.weekly_schedule, 2, 1) = 'M' AND SUBSTR(f2.weekly_schedule, 2, 1) = 'M') "+
