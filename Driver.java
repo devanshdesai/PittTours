@@ -540,32 +540,30 @@ public class Driver {
 	}
 
 	private void findPrice(String cityA, String cityB) {
-		//need to add round trips
 		try {
 			Statement s = connection.createStatement();
-			String sql = "SELECT * FROM Price WHERE departure_city = '" + cityA + "' AND arrival_city = '" + cityB + "';";
+			String sql = "SELECT * FROM Price p INNER JOIN Airline a ON p.Airline_ID = a.Airline_ID WHERE p.Departure_City = '" + cityA + "' AND p.Arrival_City = '" + cityB + "'";
 			ResultSet r = s.executeQuery(sql);
-
-			System.out.println();
-			System.out.println("Flights from " + cityA + " to " + cityB);
-			System.out.println();
-
+			System.out.println("\n\nOne-way flights from " + cityA + " to " + cityB);
 			while (r.next()) {
-		    	System.out.println("Depart: " + r.getString(1) + " Arrive: " + r.getString(2) + " Airline:" + r.getString(3) + " \n"
-			      + "High Price: " + r.getLong(4) + "Low Price: " + r.getLong(5));
+		    	System.out.println("  Depart: " + r.getString("Departure_City") + "  Arrive: " + r.getString("Arrival_City") + "  Airline: " + r.getString("Airline_Name") + " \n"
+			      + "    High Price: " + r.getLong("High_Price") + "  Low Price: " + r.getLong("Low_Price"));
 		    }
 
-		    sql = "SELECT * FROM Price WHERE departure_city = '" + cityB + "' AND arrival_city = '" + cityA + "';";
+		    sql = "SELECT * FROM Price p INNER JOIN Airline a ON p.Airline_ID = a.Airline_ID WHERE p.Departure_City = '" + cityB + "' AND p.Arrival_City = '" + cityA + "'";
 			r = s.executeQuery(sql);
-
-			System.out.println();
-			System.out.println("Flights from " + cityB + " to " + cityA);
-			System.out.println();
-
+			System.out.println("\n\nOne-way flights from " + cityB + " to " + cityA);
 			while (r.next()) {
-		    	System.out.println("Depart: " + r.getString(1) + " Arrive: " + r.getString(2) + " Airline:" + r.getString(3) + " \n"
-			      + "High Price: " + r.getLong(4) + "Low Price: " + r.getLong(5));
+		    	System.out.println("  Depart: " + r.getString("Departure_City") + "  Arrive: " + r.getString("Arrival_City") + "  Airline: " + r.getString("Airline_Name") + " \n"
+			      + "    High Price: " + r.getLong("High_Price") + "  Low Price: " + r.getLong("Low_Price"));
 		    }
+
+			sql = "SELECT * FROM Airline a INNER JOIN (SELECT Airline_ID, SUM(High_Price) AS High, SUM(Low_Price) AS Low FROM Price p WHERE Departure_City = '" + cityA + "' AND Arrival_City = '" + cityB + "' OR Departure_City = '" + cityB + "' AND Arrival_City = '" + cityA + "' GROUP BY Airline_ID) p ON a.Airline_ID = p.Airline_ID";
+			r = s.executeQuery(sql);
+			System.out.println("\n\nRound-trip flights between " + cityA + " to " + cityB);
+			while (r.next()) {
+				System.out.println("  Airline: " + r.getString("Airline_Name") + " \n" + "    High Price: " + r.getLong("High") + "  Low Price: " + r.getLong("Low"));
+			}
 
 		    r.close();
 		}
@@ -581,13 +579,11 @@ public class Driver {
 				"FROM Flight WHERE departure_city = '" + cityA + "' AND arrival_city = '" + cityB + "';";
 			ResultSet r = s.executeQuery(sql);
 
-			System.out.println();
-			System.out.println("Direct flights from " + cityA + " to " + cityB);
-			System.out.println();
+			System.out.println("\nDirect flights from " + cityA + " to " + cityB);
 
 			while (r.next()) {
-		    	System.out.println("Flight Number: " + r.getString(1) + " Airline: " + r.getString(2) + " \n"
-			      + "Depart: " + r.getString(3) + " Arrive " + r.getString(4) + " Depart Time: " + r.getString(5) + " Arrive Time: " + r.getString(6));
+		    	System.out.println("  Flight Number: " + r.getString(1) + " Airline: " + r.getString(2) + " \n"
+			      + "    Depart: " + r.getString(3) + " Arrive " + r.getString(4) + " Depart Time: " + r.getString(5) + " Arrive Time: " + r.getString(6));
 		    }
 
 		    System.out.println();
