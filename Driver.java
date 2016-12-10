@@ -603,7 +603,7 @@ public class Driver {
 	private void routesBetweenCities(String cityA, String cityB) {
 		try {
 			Statement s = connection.createStatement();
-			String sql = "SELECT Flight_number, Airline_ID, Departure_city, Arrival_City, Departure_time, Arrival_time" +
+			String sql = "SELECT Flight_number, Airline_ID, Departure_city, Arrival_City, Departure_time, Arrival_time " +
 				"FROM Flight WHERE departure_city = '" + cityA + "' AND arrival_city = '" + cityB + "';";
 			ResultSet r = s.executeQuery(sql);
 
@@ -647,15 +647,15 @@ public class Driver {
 		}
 	}
 
-	private void routesBetweenCitiesOnAirline(String cityA, String cityB, String airline) {
+	private void routesBetweenCitiesOnAirline(String cityA, String cityB, String airline_abbreviation) {
 		try {
 
 		Statement s = connection.createStatement();
-			String sql = "SELECT Flight_number, Airline_ID, Departure_city, Arrival_City, Departure_time, Arrival_time" +
+			String sql = "SELECT Flight_number, Airline_ID, Departure_city, Arrival_City, Departure_time, Arrival_time " +
 				"FROM Flight " +
 				"WHERE departure_city = '" + cityA + "' " +
-				"AND arrival_city = '" + cityB + "'" +
-				"AND Airline_ID = '" + airline + "';";
+				"AND arrival_city = '" + cityB + "' " +
+				"AND Airline_Abbreviation = '" + airline_abbreviation + "';";
 			ResultSet r = s.executeQuery(sql);
 
 			System.out.println();
@@ -674,18 +674,18 @@ public class Driver {
 		    sql = "SELECT f1.Flight_number, f1.Airline_ID, f1.Departure_city, f1.Arrival_City, f1.Departure_time, f1.Arrival_time, "+
 		    			"f2.Flight_number, f2.Airline_ID, f2.Departure_city, f2.Arrival_City, f2.Departure_time, f2.Arrival_time "+
 				"FROM FLIGHT f1, FLIGHT f2 "+
-				"WHERE f1.Arrival_City = f2.Departure_city"+
-				"AND f1.Departure_city = '" + cityA + "'"+
-				"AND f2.Arrival_City = '" + cityB + "'"+
-				"AND f1.Airline_ID = '" + airline + "'" +
-				"AND f2.Airline_ID = '" + airline + "'" +
-				"AND (TO_NUMBER(f2.Departure_Time) - TO_NUMBER(f1.Arrival_time) > 100)"+
-				"AND ((SUBSTR(f1.weekly_schedule, 1, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 1, 1) = 'S')"+
-					"OR (SUBSTR(f1.weekly_schedule, 2, 1) = 'M' AND SUBSTR(f2.weekly_schedule, 2, 1) = 'M')"+
-					"OR (SUBSTR(f1.weekly_schedule, 3, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 3, 1) = 'T')"+
-					"OR (SUBSTR(f1.weekly_schedule, 4, 1) = 'W' AND SUBSTR(f2.weekly_schedule, 4, 1) = 'W')"+
-					"OR (SUBSTR(f1.weekly_schedule, 5, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 5, 1) = 'T')"+
-					"OR (SUBSTR(f1.weekly_schedule, 6, 1) = 'F' AND SUBSTR(f2.weekly_schedule, 6, 1) = 'F')"+
+				"WHERE f1.Arrival_City = f2.Departure_city "+
+				"AND f1.Departure_city = '" + cityA + "' "+
+				"AND f2.Arrival_City = '" + cityB + "' "+
+				"AND f1.Airline_Abbreviation = '" + airline_abbreviation + "' " +
+				"AND f2.Airline_Abbreviation = '" + airline_abbreviation + "' " +
+				"AND (TO_NUMBER(f2.Departure_Time) - TO_NUMBER(f1.Arrival_time) > 100) "+
+				"AND ((SUBSTR(f1.weekly_schedule, 1, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 1, 1) = 'S') "+
+					"OR (SUBSTR(f1.weekly_schedule, 2, 1) = 'M' AND SUBSTR(f2.weekly_schedule, 2, 1) = 'M') "+
+					"OR (SUBSTR(f1.weekly_schedule, 3, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 3, 1) = 'T') "+
+					"OR (SUBSTR(f1.weekly_schedule, 4, 1) = 'W' AND SUBSTR(f2.weekly_schedule, 4, 1) = 'W') "+
+					"OR (SUBSTR(f1.weekly_schedule, 5, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 5, 1) = 'T') "+
+					"OR (SUBSTR(f1.weekly_schedule, 6, 1) = 'F' AND SUBSTR(f2.weekly_schedule, 6, 1) = 'F') "+
 					"OR (SUBSTR(f1.weekly_schedule, 7, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 7, 1) = 'S'));";
 			r = s.executeQuery(sql);
 
@@ -705,7 +705,7 @@ public class Driver {
 	private void availableSeats(String cityA, String cityB, String date) {
 		try {
 			Statement s = connection.createStatement();
-			String sql = "SELECT Flight_number, Airline_ID, Departure_city, Arrival_City, Departure_time, Arrival_time" +
+			String sql = "SELECT Flight_number, Airline_ID, Departure_city, Arrival_City, Departure_time, Arrival_time " +
 				"FROM Flight WHERE departure_city = '" + cityA + "' AND arrival_city = '" + cityB + "' AND " +
 				"(capacity(Flight_number) - reserved(Flight_number, TO_DATE('" + date + "', 'MM-DD-YYYY'))) > 0;";
 			ResultSet r = s.executeQuery(sql);
@@ -726,18 +726,18 @@ public class Driver {
 		    sql = "SELECT f1.Flight_number, f1.Airline_ID, f1.Departure_city, f1.Arrival_City, f1.Departure_time, f1.Arrival_time, "+
 		    			"f2.Flight_number, f2.Airline_ID, f2.Departure_city, f2.Arrival_City, f2.Departure_time, f2.Arrival_time "+
 				"FROM FLIGHT f1, FLIGHT f2 "+
-				"WHERE f1.Arrival_City = f2.Departure_city"+
-				"AND f1.Departure_city = '" + cityA + "'"+
-				"AND f2.Arrival_City = '" + cityB + "'"+
-				"AND (TO_NUMBER(f2.Departure_Time) - TO_NUMBER(f1.Arrival_time) > 100)"+
-				"AND (capacity(f1.Flight_number) - reserved(Flight_number, TO_DATE('" + date + "', 'MM-DD-YYYY'))) > 0" +
-				"AND (capacity(f2.Flight_number) - reserved(Flight_number, TO_DATE('" + date + "', 'MM-DD-YYYY'))) > 0" +
-				"AND ((SUBSTR(f1.weekly_schedule, 1, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 1, 1) = 'S')"+
-					"OR (SUBSTR(f1.weekly_schedule, 2, 1) = 'M' AND SUBSTR(f2.weekly_schedule, 2, 1) = 'M')"+
-					"OR (SUBSTR(f1.weekly_schedule, 3, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 3, 1) = 'T')"+
-					"OR (SUBSTR(f1.weekly_schedule, 4, 1) = 'W' AND SUBSTR(f2.weekly_schedule, 4, 1) = 'W')"+
-					"OR (SUBSTR(f1.weekly_schedule, 5, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 5, 1) = 'T')"+
-					"OR (SUBSTR(f1.weekly_schedule, 6, 1) = 'F' AND SUBSTR(f2.weekly_schedule, 6, 1) = 'F')"+
+				"WHERE f1.Arrival_City = f2.Departure_city "+
+				"AND f1.Departure_city = '" + cityA + "' "+
+				"AND f2.Arrival_City = '" + cityB + "' "+
+				"AND (TO_NUMBER(f2.Departure_Time) - TO_NUMBER(f1.Arrival_time) > 100) "+
+				"AND (capacity(f1.Flight_number) - reserved(Flight_number, TO_DATE('" + date + "', 'MM-DD-YYYY'))) > 0 " +
+				"AND (capacity(f2.Flight_number) - reserved(Flight_number, TO_DATE('" + date + "', 'MM-DD-YYYY'))) > 0 " +
+				"AND ((SUBSTR(f1.weekly_schedule, 1, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 1, 1) = 'S') "+
+					"OR (SUBSTR(f1.weekly_schedule, 2, 1) = 'M' AND SUBSTR(f2.weekly_schedule, 2, 1) = 'M') "+
+					"OR (SUBSTR(f1.weekly_schedule, 3, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 3, 1) = 'T') "+
+					"OR (SUBSTR(f1.weekly_schedule, 4, 1) = 'W' AND SUBSTR(f2.weekly_schedule, 4, 1) = 'W') "+
+					"OR (SUBSTR(f1.weekly_schedule, 5, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 5, 1) = 'T') "+
+					"OR (SUBSTR(f1.weekly_schedule, 6, 1) = 'F' AND SUBSTR(f2.weekly_schedule, 6, 1) = 'F') "+
 					"OR (SUBSTR(f1.weekly_schedule, 7, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 7, 1) = 'S'))";
 			r = s.executeQuery(sql);
 
@@ -754,12 +754,12 @@ public class Driver {
 		}
 	}
 
-	private void availableSeats(String cityA, String cityB, String date, String airline) {
+	private void availableSeats(String cityA, String cityB, String date, String airline_abbreviation) {
 		try {
 			Statement s = connection.createStatement();
-			String sql = "SELECT Flight_number, Airline_ID, Departure_city, Arrival_City, Departure_time, Arrival_time" +
-				"FROM Flight WHERE departure_city = '" + cityA + "' AND arrival_city = '" + cityB + "' AND Airline_ID = '" + airline + "'" +
-				"(capacity(Flight_number) - reserved(Flight_number, TO_DATE('" + date + "', 'MM-DD-YYYY'))) > 0;";
+			String sql = "SELECT Flight_number, Airline_ID, Departure_city, Arrival_City, Departure_time, Arrival_time " +
+				"FROM Flight WHERE departure_city = '" + cityA + "' AND arrival_city = '" + cityB + "' AND Airline_Abbreviation = '" + airline_abbreviation + "' " +
+				"AND (capacity(Flight_number) - reserved(Flight_number, TO_DATE('" + date + "', 'MM-DD-YYYY'))) > 0;";
 			ResultSet r = s.executeQuery(sql);
 
 			System.out.println();
@@ -778,20 +778,20 @@ public class Driver {
 		    sql = "SELECT f1.Flight_number, f1.Airline_ID, f1.Departure_city, f1.Arrival_City, f1.Departure_time, f1.Arrival_time, "+
 		    			"f2.Flight_number, f2.Airline_ID, f2.Departure_city, f2.Arrival_City, f2.Departure_time, f2.Arrival_time "+
 				"FROM FLIGHT f1, FLIGHT f2 "+
-				"WHERE f1.Arrival_City = f2.Departure_city"+
-				"AND f1.Departure_city = '" + cityA + "'"+
-				"AND f2.Arrival_City = '" + cityB + "'"+
-				"AND f1.Airline_ID = '" + airline + "'" +
-				"AND f2.Airline_ID = '" + airline + "'" +
-				"AND (TO_NUMBER(f2.Departure_Time) - TO_NUMBER(f1.Arrival_time) > 100)"+
-				"AND (capacity(f1.Flight_number) - reserved(Flight_number, TO_DATE('" + date + "', 'MM-DD-YYYY'))) > 0" +
+				"WHERE f1.Arrival_City = f2.Departure_city "+
+				"AND f1.Departure_city = '" + cityA + "' "+
+				"AND f2.Arrival_City = '" + cityB + "' "+
+				"AND f1.Airline_Abbreviation = '" + airline_abbreviation + "' " +
+				"AND f2.Airline_Abbreviation = '" + airline_abbreviation + "' " +
+				"AND (TO_NUMBER(f2.Departure_Time) - TO_NUMBER(f1.Arrival_time) > 100) "+
+				"AND (capacity(f1.Flight_number) - reserved(Flight_number, TO_DATE('" + date + "', 'MM-DD-YYYY'))) > 0 " +
 				"AND (capacity(f2.Flight_number) - reserved(Flight_number, TO_DATE('" + date + "', 'MM-DD-YYYY'))) > 0" +
-				"AND ((SUBSTR(f1.weekly_schedule, 1, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 1, 1) = 'S')"+
-					"OR (SUBSTR(f1.weekly_schedule, 2, 1) = 'M' AND SUBSTR(f2.weekly_schedule, 2, 1) = 'M')"+
-					"OR (SUBSTR(f1.weekly_schedule, 3, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 3, 1) = 'T')"+
-					"OR (SUBSTR(f1.weekly_schedule, 4, 1) = 'W' AND SUBSTR(f2.weekly_schedule, 4, 1) = 'W')"+
-					"OR (SUBSTR(f1.weekly_schedule, 5, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 5, 1) = 'T')"+
-					"OR (SUBSTR(f1.weekly_schedule, 6, 1) = 'F' AND SUBSTR(f2.weekly_schedule, 6, 1) = 'F')"+
+				"AND ((SUBSTR(f1.weekly_schedule, 1, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 1, 1) = 'S') "+
+					"OR (SUBSTR(f1.weekly_schedule, 2, 1) = 'M' AND SUBSTR(f2.weekly_schedule, 2, 1) = 'M') "+
+					"OR (SUBSTR(f1.weekly_schedule, 3, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 3, 1) = 'T') "+
+					"OR (SUBSTR(f1.weekly_schedule, 4, 1) = 'W' AND SUBSTR(f2.weekly_schedule, 4, 1) = 'W') "+
+					"OR (SUBSTR(f1.weekly_schedule, 5, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 5, 1) = 'T') "+
+					"OR (SUBSTR(f1.weekly_schedule, 6, 1) = 'F' AND SUBSTR(f2.weekly_schedule, 6, 1) = 'F') "+
 					"OR (SUBSTR(f1.weekly_schedule, 7, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 7, 1) = 'S'))";
 			r = s.executeQuery(sql);
 
