@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.io.File;
+import java.io.FilenameFilter;
 //import java.text.ParseException;
 
 public class Driver {
@@ -20,8 +22,8 @@ public class Driver {
 			System.out.println("\nAdministrator interface: press [1] and [return] \nUser interface: press [2] and [return].");
 			Scanner scan = new Scanner(System.in);
 			int mode = scan.nextInt();
-			
-			if (mode == 1) admin(); 
+
+			if (mode == 1) admin();
 			else user();
 		}
 	}
@@ -105,6 +107,9 @@ public class Driver {
 						return;
 					case 8:
 						System.exit(0);
+					case 12:
+						loadAll();
+						break;
 					default:
 						System.out.println("Not a valid operation code");
 			}
@@ -229,7 +234,7 @@ public class Driver {
 						scan.skip("\n");
 						while (leg < 4) {
 							System.out.println("Enter flight number or [0] if you are finished");
-							
+
 							String flightNumber = scan.nextLine();
 							if (flightNumber.equals("0")) {
 								break;
@@ -255,7 +260,7 @@ public class Driver {
 						reservation = scan.nextLine();
 						buyTickets(reservation);
 						break;
-					case 11: 
+					case 11:
 						return;
 					case 12:
 						System.exit(0);
@@ -264,7 +269,7 @@ public class Driver {
 				}
 			}
 		}
-	
+
 
 	private void eraseDatabase() {
 		try {
@@ -288,6 +293,36 @@ public class Driver {
 		}
 		catch (Exception e) {
 			System.out.println("Error deleting the database. " + e.toString());
+		}
+	}
+
+	private void loadAll() {
+		try {
+			String directory = new java.io.File(".").getCanonicalPath();
+			File dir = new File(directory);
+			File[] allCSV = dir.listFiles(new FilenameFilter() {
+	                 public boolean accept(File dir, String filename)
+	                      { return filename.endsWith(".csv"); }
+	        } );
+
+			for (int i = 0; i < allCSV.length; i++) {
+				String name = allCSV[i].getName();
+				if (name.equals("airline.csv")) {
+					loadAirline(name);
+				}
+				else if (name.equals("flight.csv")) {
+					loadSchedule(name);
+				}
+				else if (name.equals("plane.csv")) {
+					loadPlane(name);
+				}
+				else if (name.equals("price.csv")) {
+					loadPrice(name);
+				}
+			}
+		}
+		catch (IOException e) {
+			System.out.println(e.toString());
 		}
 	}
 
@@ -756,7 +791,6 @@ public class Driver {
 		String password = "1234";
 
 		try {
-
 			DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
 		  	String url = "jdbc:oracle:thin:@class3.cs.pitt.edu:1521:dbclass";
 
