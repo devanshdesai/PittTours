@@ -151,23 +151,57 @@ CREATE OR REPLACE TRIGGER planeUpgrade
 END;
 /
 
-create or replace function capacity(FN in varchar2) 
-    return number is
-    lim number;
-begin
-    select Plane.plane_capacity into lim from Plane 
-    JOIN Flight ON Plane.Plane_type = Flight.Plane_type
-    WHERE Flight.flight_number = FN;
-    return (lim);
-end;
+CREATE OR REPLACE TRIGGER cancelReservation
+	AFTER UPDATE ON System_Date
+	FOR EACH ROW
+	DECLARE
+		ownID varchar(5);
+		biggerPlaneType char(4);
+		biggerPlaneCapacity int;
+		isTicketed varchar(1);
+		dateOfReservation date;
+		seats int;
+	BEGIN
+		FOR reservationRow in (SELECT reservation_Number, Leg, Flight_Number FROM Reservation_Detail) LOOP
+			SELECT Reservation_Date, Ticketed into dateOfReservation, isTicketed FROM Reservation WHERE Reservation_Number = reservationRow.Reservation_Number;
+
+			IF (((dateOfReservation - :NEW.C_Date) * 24) <= 12 AND isTicketed = 'N') THEN
+				DELETE FROM Reservation_Detail WHERE Leg = reservationRow.leg AND Reservation_Number = reservationRow.Reservation_Number;
+				DELETE FROM Reservation WHERE Reservation_Number = reservationRow.Reservation_Number;
+			ELSE
+                SELECT Plane_Type, Airline_ID into biggerPlaneType, ownID FROM Flight WHERE Flight_Number = reservationRow.Flight_Number;
+				SELECT COUNT(*) INTO seats FROM Reservation_Detail WHERE Flight_Number = reservationRow.Flight_Number;
+				SELECT Plane_Capacity into biggerPlaneCapacity FROM Plane WHERE Owner_ID = ownID AND Plane_Type = biggerPlaneType;
+
+				FOR planeRow in (SELECT Plane_Type, Plane_Capacity FROM Plane WHERE Owner_ID = ownID) LOOP
+					IF planeRow.Plane_Capacity < biggerPlaneCapacity AND planeRow.Plane_Capacity >= seats THEN
+						UPDATE Flight SET Plane_Type = planeRow.Plane_Type WHERE Flight_Number = reservationRow.Flight_Number;
+					END IF;
+				END LOOP;
+			END IF;
+		END LOOP;
+	EXCEPTION WHEN NO_DATA_FOUND THEN
+		DBMS_OUTPUT.PUT_LINE('No data found');
+END;
 /
 
-create or replace function reserved(FN in varchar2, DT in date) 
-    return number is
+CREATE OR REPLACE FUNCTION capacity(FN IN varchar2)
+    RETURN number is
+    lim number;
+BEGIN
+    SELECT Plane.Plane_Capacity INTO lim FROM Plane
+    JOIN Flight ON Plane.Plane_Type = Flight.Plane_Type
+    WHERE Flight.flight_number = FN;
+    RETURN (lim);
+END;
+/
+
+CREATE OR REPLACE FUNCTION reserved(FN IN varchar2, DT IN date)
+    RETURN number is
     ct number;
-begin
-    select COUNT(*) into ct from Reservation_Detail 
+BEGIN
+    SELECT COUNT(*) INTO ct FROM Reservation_Detail
     WHERE flight_number = FN AND flight_date = DT;
-    return (ct);
-end;
+    RETURN (ct);
+END;
 /
