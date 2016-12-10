@@ -75,19 +75,24 @@ public class Driver {
 						if ((response.toUpperCase()).equals("L")) {
 							System.out.println("Enter file name");
 							response = scan.nextLine();
+							loadSchedule(response);
 						}
 						else if ((response.toUpperCase()).equals("C")) {
 							System.out.println("Enter the departure city");
 							String departureCity = scan.nextLine();
 							System.out.println("Enter the arrival city");
 							String arrivalCity = scan.nextLine();
+							System.out.println("Enter the airline of the flight");
+							String airline = scan.nextLine();
 							System.out.println("Enter the new high price");
 							int highPrice = scan.nextInt();
 							System.out.println("Enter the new low price");
 							int lowPrice = scan.nextInt();
-							changePrice(departureCity, arrivalCity, highPrice, lowPrice);
+							changePrice(departureCity, arrivalCity, airline, highPrice, lowPrice);
 						}
-						loadSchedule(response);
+						else {
+							System.out.println("\nPricing was unchanged.\n");
+						}
 						break;
 					case 5:
 						System.out.println("Enter file name");
@@ -411,11 +416,12 @@ public class Driver {
 		}
 	}
 
-	private void changePrice(String departure, String arrival, int high, int low) {
+	private void changePrice(String departure, String arrival, String airline, int high, int low) {
 		try {
 			Statement s = connection.createStatement();
-			String sql = "UPDATE Price SET High_Price = " + high + ", Low_Price = " + low + " WHERE Airline_ID = (SELECT Airline_ID FROM Price WHERE Departure_City = '" + departure + "'" + "AND Arrival_City = '" + arrival + "')";
+			String sql = "UPDATE Price SET High_Price = " + high + ", Low_Price = " + low + " WHERE Airline_ID = (SELECT p.Airline_ID FROM Price p LEFT JOIN Airline a ON p.Airline_ID = a.Airline_ID WHERE p.Departure_City = '" + departure + "'" + "AND p.Arrival_City = '" + arrival + "' AND a.Airline_Name = '" + airline + "')";
 			s.executeUpdate(sql);
+			System.out.println("\nThe price of the " + airline + " flight from " + departure + " to " + arrival + " was changed to " + high + "|" + low + ".\n");
 		}
 		catch (Exception e) {
 			System.out.println(e.toString());
@@ -506,23 +512,27 @@ public class Driver {
 			Statement s = connection.createStatement();
 			String sql = "SELECT * FROM Customer WHERE First_Name = '" + first + "' AND Last_Name = '" + last + "'";
 			ResultSet r = s.executeQuery(sql);
-			r.next();
-			String cid = r.getString("CID");
-			String salutation = r.getString("Salutation");
-			String credit = r.getString("Credit_Card_Num");
-			Date creditExpire = r.getDate("Credit_Card_Expire");
-			String street = r.getString("Street");
-			String city = r.getString("City");
-			String state = r.getString("State");
-			String phone = r.getString("Phone");
-			String email = r.getString("Email");
-			String freq = r.getString("Frequent_Miles");
+			if (r.next()) {
+				String cid = r.getString("CID");
+				String salutation = r.getString("Salutation");
+				String credit = r.getString("Credit_Card_Num");
+				Date creditExpire = r.getDate("Credit_Card_Expire");
+				String street = r.getString("Street");
+				String city = r.getString("City");
+				String state = r.getString("State");
+				String phone = r.getString("Phone");
+				String email = r.getString("Email");
+				String freq = r.getString("Frequent_Miles");
 
-			DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
-			String creditExpireStr = df.format(creditExpire);
+				DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+				String creditExpireStr = df.format(creditExpire);
 
-			System.out.println("\n" + salutation + ". " + first + " " + last + "\n" + email + "\n" + phone + "\n" + street + "\n" + city + ", " + state
-			+ "\n" + credit + "\n" + creditExpireStr + "\n" + "PittRewards #: " + cid + "\nFrequent Flyer #: " + freq + "\n");
+				System.out.println("\n" + salutation + ". " + first + " " + last + "\n" + email + "\n" + phone + "\n" + street + "\n" + city + ", " + state
+				+ "\n" + credit + "\n" + creditExpireStr + "\n" + "PittRewards #: " + cid + "\nFrequent Flyer #: " + freq + "\n");
+			}
+			else {
+				System.out.println("\n" + first + " " + last + " was not found.");
+			}
 		}
 		catch (Exception e) {
 			System.out.println(e.toString());
