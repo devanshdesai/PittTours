@@ -1,5 +1,6 @@
 import java.sql.*;
 import java.util.Scanner;
+import java.util.Random;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -182,7 +183,6 @@ public class Driver {
 						first = scan.nextLine();
 						System.out.println("Enter customer last name");
 						last = scan.nextLine();
-						System.out.println(last);
 						showCustomer(first.trim(), last.trim());
 						break;
 					case 3:
@@ -249,10 +249,10 @@ public class Driver {
 							flights[leg] = flightNumber;
 							System.out.println("Enter date [MM-DD-YYYY]");
 							date = scan.nextLine();
-							if(full(flightNumber,date)) {
-								System.out.println("This flight is full, please try again");
+
+							if(full(flightNumber,date)) 
 								break;
-							}
+							
 							dates[leg] = date;
 							leg++;
 						}
@@ -289,14 +289,18 @@ public class Driver {
 			int capacity = r.getInt(1);
 			sql = "SELECT reserved('"+flight+"', TO_DATE('"+date+"', 'MM-DD-YYYY')) FROM flight WHERE flight_number = " + flight;
 			r = s.executeQuery(sql);
-			r.next()
+			r.next();
 			int reserved = r.getInt(1);
-			if(capacity == reserved) return true;
+			if(capacity == reserved) {
+				System.out.println("This flight is full");
+				return true;
+			} 
+				
 			return false;
 		}
 		catch (Exception e) {
 			System.out.println("Error fetching the specified flight. " + e.toString());
-			return;
+			return true;
 		}
 	}
 
@@ -831,8 +835,8 @@ public class Driver {
 			String credit = r.getString("Credit_Card_Num");
 			String freq = r.getString("Frequent_Miles");
 
-			if(credit = null) credit = "";
-			if(freq = null) freq = "";
+			if(credit == null) credit = "";
+			if(freq == null) freq = "";
 
 
 			//get start and end cities for the whole reservation
@@ -846,7 +850,7 @@ public class Driver {
 			r.next();
 			String arrival_city = r.getString("Arrival_City");
 
-			sql = "SELECT TO_CHAR (SYSDATE, 'MM-DD-YYYY') "NOW" FROM DUAL";
+			sql = "SELECT TO_CHAR (SYSDATE, 'MM-DD-YYYY') NOW FROM DUAL";
 			r = s.executeQuery(sql);
 			r.next();
 			String today = r.getString("NOW");
@@ -862,10 +866,14 @@ public class Driver {
 				String airline = r.getString("Airline_ID");
 
 				//if same day flight, add high price, else add low price
-				if(dates[i].equals(today)
+				if(dates[i].equals(today)) {
+
 					sql = "SELECT High_Price FROM Price WHERE Departure_city = '" + d_city + "' AND Arrival_City = '" + a_city + "' AND Airline_ID = '"+ airline + "'";
-				else
+				}
+				else{
+
 					sql = "SELECT Low_Price FROM Price WHERE Departure_city = '" + d_city + "' AND Arrival_City = '" + a_city + "' AND Airline_ID = '"+ airline + "'";
+				}
 				
 				r = s.executeQuery(sql);
 				r.next();
@@ -881,10 +889,10 @@ public class Driver {
 
 			//generate random reservation number
 			String res_num;
-			Random r = new Random();
+			Random ran = new Random();
 			while(true){
-				int random = r.nextInt(100000)
-				res_num = String.format("%05d", String.parseInt(random));
+				int random = ran.nextInt(100000);
+				res_num = String.format("%05d", Integer.toString(random));
 				sql = "SELECT * FROM Reservation WHERE Reservation_Number = '" + res_num + "'";
 				r = s.executeQuery(sql);
 				//check if resultSet is empty, if so, we've found a new reservation number
@@ -894,20 +902,12 @@ public class Driver {
 			//insert flights into reservation_detail
 			for(int i = 0; i < flights.length; i++){
 				sql = "INSERT INTO Reservation_Detail VALUES('" + res_num + "', '"+ flights[i] + "', '" + dates[i] + "', " + Integer.toString(i) + ")";
-				r.executeQuery(sql);
+				s.executeQuery(sql);
 			}
 			
 			sql = "INSERT INTO Reservation VALUES('" + res_num + "', " + cid + "', " + Integer.toString(totalPrice) + ", '" + credit + "', TO_DATE('"+ today +"', 'MM-DD-YYYY')," + 
 				"'N', '" + departure_city + "', '"+ arrival_city + "')";
-
-			System.out.println();
-			System.out.println("Direct flights from " + cityA + " to " + cityB);
-			System.out.println();
-
-			while (r.next()) {
-		    	System.out.println("Flight Number: " + r.getString(1) + " Airline: " + r.getString(2) + " \n"
-			      + "Depart: " + r.getString(3) + " Arrive " + r.getString(4) + " Depart Time: " + r.getString(5) + " Arrive Time: " + r.getString(6));
-		    }
+			s.executeQuery(sql);
 
 		    System.out.println("Reservation number " + res_num + "confirmed");
 
@@ -918,8 +918,36 @@ public class Driver {
 		}
 	}
 
-	private void showReservation(String reservation) {
+	private void showReservation(String reservation_number) {
+		try{
+			Statement s = connection.createStatement();
+			String sql = "SELECT * FROM Reservation WHERE Reservation_Number = '" + reservation_number + "'";
+			ResultSet r = s.executeQuery(sql);
 
+			//check if reservation exists
+			if (!r.isBeforeFirst() ) {    
+    			System.out.println("Reservation number not found"); 
+    			return;
+			}
+
+			String res_num = r.getString("Reservation_Number");
+			String cid = r.getString("CID");
+			String credit = r.getString("Credit_Card_Num");
+			int cost = r.getInt("Cost");
+			Date dt = r.getDate("Reservation_Date");
+			String ticket = r.getString("Ticketed");
+			String start = r.getString("Start_city");
+			String end = r.getString("End_city");
+
+			DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+			String res_date = df.format(dt);
+
+			System.out.println("\n" + res_num + "\n" + cid + "\n" + credit + "\n" + Integer.toString(cost) + "\n" + res_date + "\n" + 
+			"\n Ticketed: " + ticket + "\n" + start + " to " + end);
+		}
+		catch(Exception e) {
+			System.out.println("Error finding reservation" + e.toString());
+		}
 	}
 
 	private void buyTickets(String reservation) {
@@ -928,8 +956,8 @@ public class Driver {
 
 
 	public static void main(String args[]) throws SQLException {
-		String username = "dmd113";
-		String password = "1234";
+		String username = "kwz5";
+		String password = "asdfj";
 
 		try {
 			DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
