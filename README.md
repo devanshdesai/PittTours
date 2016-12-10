@@ -5,7 +5,7 @@
 #### Completed
 * Admin commands
 * Admin commands testing
-* Customer commands #1-3 implemented and tested
+* Customer commands #1-4 implemented and tested
 
 #### To Be Finished
 * cancelReservation trigger
