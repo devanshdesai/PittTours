@@ -16,22 +16,30 @@ public class Driver {
     private String query;
 
 	public Driver() {
-		System.out.println("Hello, if you would like the administrator interface, press [1] and [return]. For the user interface, press [2] and [return].");
+		while(true){
+			System.out.println("\nAdministrator interface: press [1] and [return] \nUser interface: press [2] and [return].");
+			Scanner scan = new Scanner(System.in);
+			int mode = scan.nextInt();
+			
+			if (mode == 1) admin(); 
+			else user();
+		}
+	}
+
+	void admin(){
 		Scanner scan = new Scanner(System.in);
-		int mode = scan.nextInt();
 		int operation = 0;
 		String response;
-
-		if (mode == 1) {
-			while (true) {
-				System.out.println("Choose an operation: \n"
+		while(true){
+			System.out.println("\nChoose an operation: \n"
 					+ "[1] Erase the database \n"
 					+ "[2] Load airline information \n"
 					+ "[3] Load schedule information \n"
 					+ "[4] Load pricing information \n"
 					+ "[5] Load plane information \n"
 					+ "[6] Generate passenger manifest for specific flight on given day \n"
-					+ "[7] Exit");
+					+ "[7] Return to interface menu \n"
+					+ "[8] Exit");
 				operation = scan.nextInt();
 				switch (operation) {
 					case 1:
@@ -94,15 +102,20 @@ public class Driver {
 						passengerManifest(flight, date);
 						break;
 					case 7:
+						return;
+					case 8:
 						System.exit(0);
 					default:
 						System.out.println("Not a valid operation code");
-				}
 			}
 		}
-		else {
-			while (true) {
-				System.out.println("Choose an operation: \n"
+	}
+	void user(){
+		Scanner scan = new Scanner(System.in);
+		int operation = 0;
+		String response;
+		while (true) {
+				System.out.println("\nChoose an operation: \n"
 					+ "[1] Add customer \n"
 					+ "[2] Show customer info, given customer name \n"
 					+ "[3] Find price for flights between two cities \n"
@@ -113,7 +126,8 @@ public class Driver {
 					+ "[8] Add reservation \n"
 					+ "[9] Show reservation info, given reservation number \n"
 					+ "[10] Buy ticket from existing reservation\n"
-					+ "[11] Exit");
+					+ "[11] Return to interface menu\n"
+					+ "[12] Exit");
 				operation = scan.nextInt();
 				String cityA;
 				String cityB;
@@ -241,14 +255,16 @@ public class Driver {
 						reservation = scan.nextLine();
 						buyTickets(reservation);
 						break;
-					case 11:
+					case 11: 
+						return;
+					case 12:
 						System.exit(0);
 					default:
 						System.out.println("Not a valid operation code");
 				}
 			}
 		}
-	}
+	
 
 	private void eraseDatabase() {
 		try {
