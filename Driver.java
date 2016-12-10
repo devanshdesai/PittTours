@@ -59,26 +59,21 @@ public class Driver {
 						loadSchedule(response);
 						break;
 					case 4:
-						System.out.println("Would you like to load pricing information [L] or change the price of an exisiting flight [C]? [L/C]");
+						System.out.println("Would you like to load pricing information [L] or change the price of an existing flight [C]? [L/C]");
 						scan.skip("\n");
 						response = scan.nextLine();
 						if ((response.toUpperCase()).equals("L")) {
 							System.out.println("Enter file name");
-							scan.skip("\n");
 							response = scan.nextLine();
 						}
 						else if ((response.toUpperCase()).equals("C")) {
 							System.out.println("Enter the departure city");
-							scan.skip("\n");
 							String departureCity = scan.nextLine();
 							System.out.println("Enter the arrival city");
-							scan.skip("\n");
 							String arrivalCity = scan.nextLine();
 							System.out.println("Enter the new high price");
-							scan.skip("\n");
 							int highPrice = scan.nextInt();
 							System.out.println("Enter the new low price");
-							scan.skip("\n");
 							int lowPrice = scan.nextInt();
 							changePrice(departureCity, arrivalCity, highPrice, lowPrice);
 						}
@@ -95,7 +90,6 @@ public class Driver {
 						scan.skip("\n");
 						String flight = scan.nextLine();
 						System.out.println("Enter date [MM-DD-YYYY]");
-						scan.skip("\n");
 						String date = scan.nextLine();
 						passengerManifest(flight, date);
 						break;
@@ -163,10 +157,12 @@ public class Driver {
 						first = scan.nextLine();
 						System.out.println("Enter customer last name");
 						last = scan.nextLine();
-						showCustomer(first, last);
+						System.out.println(last);
+						showCustomer(first.trim(), last.trim());
 						break;
 					case 3:
 						System.out.println("Enter start city (eg. PIT)");
+						scan.skip("\n");
 						cityA = scan.nextLine();
 						System.out.println("Enter end city");
 						cityB = scan.nextLine();
@@ -174,6 +170,7 @@ public class Driver {
 						break;
 					case 4:
 						System.out.println("Enter start city (eg. PIT)");
+						scan.skip("\n");
 						cityA = scan.nextLine();
 						System.out.println("Enter end city");
 						cityB = scan.nextLine();
@@ -181,6 +178,7 @@ public class Driver {
 						break;
 					case 5:
 						System.out.println("Enter start city (eg. PIT)");
+						scan.skip("\n");
 						cityA = scan.nextLine();
 						System.out.println("Enter end city");
 						cityB = scan.nextLine();
@@ -193,10 +191,8 @@ public class Driver {
 						scan.skip("\n");
 						cityA = scan.nextLine();
 						System.out.println("Enter end city");
-						scan.skip("\n");
 						cityB = scan.nextLine();
 						System.out.println("Enter date [MM-DD-YYYY]");
-						scan.skip("\n");
 						date = scan.nextLine();
 						availableSeats(cityA, cityB, date);
 						break;
@@ -205,13 +201,10 @@ public class Driver {
 						scan.skip("\n");
 						cityA = scan.nextLine();
 						System.out.println("Enter end city");
-						scan.skip("\n");
 						cityB = scan.nextLine();
 						System.out.println("Enter date [MM-DD-YYYY]");
-						scan.skip("\n");
 						date = scan.nextLine();
 						System.out.println("Enter airline code (eg. AAL)");
-						scan.skip("\n");
 						airline = scan.nextLine();
 						availableSeats(cityA, cityB, date, airline);
 						break;
@@ -219,19 +212,17 @@ public class Driver {
 						int leg = 0;
 						String flights[] = new String[4];
 						String dates[] = new String[4];
-
+						scan.skip("\n");
 						while (leg < 4) {
 							System.out.println("Enter flight number or [0] if you are finished");
-							scan.skip("\n");
+							
 							String flightNumber = scan.nextLine();
-
 							if (flightNumber.equals("0")) {
 								break;
 							}
 
 							flights[leg] = flightNumber;
 							System.out.println("Enter date [MM-DD-YYYY]");
-							scan.skip("\n");
 							date = scan.nextLine();
 							dates[leg] = date;
 							leg++;
@@ -254,7 +245,6 @@ public class Driver {
 						System.exit(0);
 					default:
 						System.out.println("Not a valid operation code");
-						scan.skip("\n");
 				}
 			}
 		}
@@ -627,11 +617,109 @@ public class Driver {
 	}
 
 	private void availableSeats(String cityA, String cityB, String date) {
+		try {
+			Statement s = connection.createStatement();
+			String sql = "SELECT Flight_number, Airline_ID, Departure_city, Arrival_City, Departure_time, Arrival_time" +
+				"FROM Flight WHERE departure_city = '" + cityA + "' AND arrival_city = '" + cityB + "' AND " +
+				"(capacity(Flight_number) - reserved(Flight_number, TO_DATE('" + date + "', 'YYYY-MM-DD'))) > 0;";
+			ResultSet r = s.executeQuery(sql);
 
+			System.out.println();
+			System.out.println("Direct flights from " + cityA + " to " + cityB);
+			System.out.println();
+
+			while (r.next()) {
+		    	System.out.println("Flight Number: " + r.getString(1) + " Airline: " + r.getString(2) + " \n"
+			      + "Depart: " + r.getString(3) + " Arrive " + r.getString(4) + " Depart Time: " + r.getString(5) + " Arrive Time: " + r.getString(6));
+		    }
+
+		    System.out.println();
+			System.out.println("Flights with one connection from " + cityA + " to " + cityB);
+			System.out.println();
+
+		    sql = "SELECT f1.Flight_number, f1.Airline_ID, f1.Departure_city, f1.Arrival_City, f1.Departure_time, f1.Arrival_time, "+
+		    			"f2.Flight_number, f2.Airline_ID, f2.Departure_city, f2.Arrival_City, f2.Departure_time, f2.Arrival_time "+
+				"FROM FLIGHT f1, FLIGHT f2 "+
+				"WHERE f1.Arrival_City = f2.Departure_city"+
+				"AND f1.Departure_city = '" + cityA + "'"+
+				"AND f2.Arrival_City = '" + cityB + "'"+
+				"AND (TO_NUMBER(f2.Departure_Time) - TO_NUMBER(f1.Arrival_time) > 100)"+
+				"AND (capacity(f1.Flight_number) - reserved(Flight_number, TO_DATE('" + date + "', 'YYYY-MM-DD'))) > 0" +
+				"AND (capacity(f2.Flight_number) - reserved(Flight_number, TO_DATE('" + date + "', 'YYYY-MM-DD'))) > 0" +
+				"AND ((SUBSTR(f1.weekly_schedule, 1, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 1, 1) = 'S')"+
+					"OR (SUBSTR(f1.weekly_schedule, 2, 1) = 'M' AND SUBSTR(f2.weekly_schedule, 2, 1) = 'M')"+
+					"OR (SUBSTR(f1.weekly_schedule, 3, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 3, 1) = 'T')"+
+					"OR (SUBSTR(f1.weekly_schedule, 4, 1) = 'W' AND SUBSTR(f2.weekly_schedule, 4, 1) = 'W')"+
+					"OR (SUBSTR(f1.weekly_schedule, 5, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 5, 1) = 'T')"+
+					"OR (SUBSTR(f1.weekly_schedule, 6, 1) = 'F' AND SUBSTR(f2.weekly_schedule, 6, 1) = 'F')"+
+					"OR (SUBSTR(f1.weekly_schedule, 7, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 7, 1) = 'S'));";
+			r = s.executeQuery(sql);
+
+			while (r.next()) {
+		    	System.out.println( r.getString(1) + " " + r.getString(2) + r.getString(3) + " " +r.getString(4) + " " +r.getString(5) + " " +r.getString(6) + "\n" +
+			      r.getString(7) + " " + r.getString(8) + r.getString(9) + " " +r.getString(10) + " " +r.getString(11) + " " +r.getString(12));
+		    	System.out.println();
+		    }
+
+		    r.close();
+		}
+		catch (Exception e) {
+			System.out.println(e.toString());
+		}
 	}
 
 	private void availableSeats(String cityA, String cityB, String date, String airline) {
+		try {
+			Statement s = connection.createStatement();
+			String sql = "SELECT Flight_number, Airline_ID, Departure_city, Arrival_City, Departure_time, Arrival_time" +
+				"FROM Flight WHERE departure_city = '" + cityA + "' AND arrival_city = '" + cityB + "' AND Airline_ID = '" + airline + "'" +
+				"(capacity(Flight_number) - reserved(Flight_number, TO_DATE('" + date + "', 'YYYY-MM-DD'))) > 0;";
+			ResultSet r = s.executeQuery(sql);
 
+			System.out.println();
+			System.out.println("Direct flights from " + cityA + " to " + cityB);
+			System.out.println();
+
+			while (r.next()) {
+		    	System.out.println("Flight Number: " + r.getString(1) + " Airline: " + r.getString(2) + " \n"
+			      + "Depart: " + r.getString(3) + " Arrive " + r.getString(4) + " Depart Time: " + r.getString(5) + " Arrive Time: " + r.getString(6));
+		    }
+
+		    System.out.println();
+			System.out.println("Flights with one connection from " + cityA + " to " + cityB);
+			System.out.println();
+
+		    sql = "SELECT f1.Flight_number, f1.Airline_ID, f1.Departure_city, f1.Arrival_City, f1.Departure_time, f1.Arrival_time, "+
+		    			"f2.Flight_number, f2.Airline_ID, f2.Departure_city, f2.Arrival_City, f2.Departure_time, f2.Arrival_time "+
+				"FROM FLIGHT f1, FLIGHT f2 "+
+				"WHERE f1.Arrival_City = f2.Departure_city"+
+				"AND f1.Departure_city = '" + cityA + "'"+
+				"AND f2.Arrival_City = '" + cityB + "'"+
+				"AND f1.Airline_ID = '" + airline + "'" +
+				"AND f2.Airline_ID = '" + airline + "'" +
+				"AND (TO_NUMBER(f2.Departure_Time) - TO_NUMBER(f1.Arrival_time) > 100)"+
+				"AND (capacity(f1.Flight_number) - reserved(Flight_number, TO_DATE('" + date + "', 'YYYY-MM-DD'))) > 0" +
+				"AND (capacity(f2.Flight_number) - reserved(Flight_number, TO_DATE('" + date + "', 'YYYY-MM-DD'))) > 0" +
+				"AND ((SUBSTR(f1.weekly_schedule, 1, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 1, 1) = 'S')"+
+					"OR (SUBSTR(f1.weekly_schedule, 2, 1) = 'M' AND SUBSTR(f2.weekly_schedule, 2, 1) = 'M')"+
+					"OR (SUBSTR(f1.weekly_schedule, 3, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 3, 1) = 'T')"+
+					"OR (SUBSTR(f1.weekly_schedule, 4, 1) = 'W' AND SUBSTR(f2.weekly_schedule, 4, 1) = 'W')"+
+					"OR (SUBSTR(f1.weekly_schedule, 5, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 5, 1) = 'T')"+
+					"OR (SUBSTR(f1.weekly_schedule, 6, 1) = 'F' AND SUBSTR(f2.weekly_schedule, 6, 1) = 'F')"+
+					"OR (SUBSTR(f1.weekly_schedule, 7, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 7, 1) = 'S'));";
+			r = s.executeQuery(sql);
+
+			while (r.next()) {
+		    	System.out.println( r.getString(1) + " " + r.getString(2) + r.getString(3) + " " +r.getString(4) + " " +r.getString(5) + " " +r.getString(6) + "\n" +
+			      r.getString(7) + " " + r.getString(8) + r.getString(9) + " " +r.getString(10) + " " +r.getString(11) + " " +r.getString(12));
+		    	System.out.println();
+		    }
+
+		    r.close();
+		}
+		catch (Exception e) {
+			System.out.println(e.toString());
+		}
 	}
 
 	private void addReservation(String flights[], String dates[]) {
