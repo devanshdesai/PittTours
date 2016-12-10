@@ -902,12 +902,12 @@ public class Driver {
 			//insert flights into reservation_detail
 			for(int i = 0; i < flights.length; i++){
 				sql = "INSERT INTO Reservation_Detail VALUES('" + res_num + "', '"+ flights[i] + "', '" + dates[i] + "', " + Integer.toString(i) + ")";
-				s.executeQuery(sql);
+				s.executeUpdate(sql);
 			}
 			
 			sql = "INSERT INTO Reservation VALUES('" + res_num + "', " + cid + "', " + Integer.toString(totalPrice) + ", '" + credit + "', TO_DATE('"+ today +"', 'MM-DD-YYYY')," + 
 				"'N', '" + departure_city + "', '"+ arrival_city + "')";
-			s.executeQuery(sql);
+			s.executeUpdate(sql);
 
 		    System.out.println("Reservation number " + res_num + "confirmed");
 
@@ -950,8 +950,49 @@ public class Driver {
 		}
 	}
 
-	private void buyTickets(String reservation) {
+	private void buyTickets(String reservation_number) {
+		try{
+			Scanner scan = new Scanner(System.in);
+			Statement s = connection.createStatement();
+			String sql = "SELECT Credit_Card_Num FROM Reservation WHERE Reservation_Number = '" + reservation_number + "'";
+			ResultSet r = s.executeQuery(sql);
 
+			//check if reservation exists
+			if (!r.isBeforeFirst() ) {    
+    			System.out.println("Reservation number not found"); 
+    			return;
+			}
+
+			r.next();
+			String ccn = r.getString("Credit_Card_Num");
+			boolean newCCN = false;
+			if(ccn != null && ccn.length() == 16) {
+    			System.out.println("Would you like to use the credit card associated with your account? [y/n]"); 
+    			String response = scan.nextLine();
+    			if(response.equals("y")) newCCN = true; 
+			} 
+			//change credit card number
+			if(!newCCN) {
+				String newNumber;
+				while(true) {
+					System.out.println("Input your 16 digit credit card number"); 
+    				newNumber = scan.nextLine();
+    				if(newNumber.length() == 16) break;
+					System.out.println("Invalid format"); 
+				}
+				sql = "UPDATE Reservation Set Credit_Card_Num = '" + newNumber + "' WHERE Reservation_Number = '" + reservation_number + "'";
+				s.executeUpdate(sql);
+				System.out.println("Updated credit card number"); 
+			}
+
+			sql = "UPDATE Reservation Set Ticketed = 'Y' WHERE Reservation_Number = '" + reservation_number + "'";
+			s.executeUpdate(sql);
+
+			System.out.println("Ticket bought");
+		}
+		catch(Exception e) {
+			System.out.println(e.toString());
+		}
 	}
 
 
