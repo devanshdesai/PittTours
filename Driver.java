@@ -603,42 +603,38 @@ public class Driver {
 	private void routesBetweenCities(String cityA, String cityB) {
 		try {
 			Statement s = connection.createStatement();
-			String sql = "SELECT Flight_number, Airline_ID, Departure_city, Arrival_City, Departure_time, Arrival_time" +
-				"FROM Flight WHERE departure_city = '" + cityA + "' AND arrival_city = '" + cityB + "';";
+			String sql = "SELECT Flight_number, Airline_ID, Departure_city, Arrival_City, Departure_time, Arrival_time " +
+				"FROM Flight WHERE Departure_City = '" + cityA + "' AND Arrival_City = '" + cityB + "'";
 			ResultSet r = s.executeQuery(sql);
 
 			System.out.println("\nDirect flights from " + cityA + " to " + cityB);
-
 			while (r.next()) {
 		    	System.out.println("  Flight Number: " + r.getString(1) + " Airline: " + r.getString(2) + " \n"
 			      + "    Depart: " + r.getString(3) + " Arrive " + r.getString(4) + " Depart Time: " + r.getString(5) + " Arrive Time: " + r.getString(6));
 		    }
 
-		    System.out.println();
-			System.out.println("Flights with one connection from " + cityA + " to " + cityB);
-			System.out.println();
+			System.out.println("\nFlights with one connection from " + cityA + " to " + cityB);
 
-		    sql = "SELECT f1.Flight_number, f1.Airline_ID, f1.Departure_city, f1.Arrival_City, f1.Departure_time, f1.Arrival_time, "+
-		    			"f2.Flight_number, f2.Airline_ID, f2.Departure_city, f2.Arrival_City, f2.Departure_time, f2.Arrival_time "+
-				"FROM FLIGHT f1, FLIGHT f2 "+
-				"WHERE f1.Arrival_City = f2.Departure_city"+
-				"AND f1.Departure_city = '" + cityA + "'"+
-				"AND f2.Arrival_City = '" + cityB + "'"+
-				"AND (TO_NUMBER(f2.Departure_Time) - TO_NUMBER(f1.Arrival_time) > 100)"+
-				"AND ((SUBSTR(f1.weekly_schedule, 1, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 1, 1) = 'S')"+
-					"OR (SUBSTR(f1.weekly_schedule, 2, 1) = 'M' AND SUBSTR(f2.weekly_schedule, 2, 1) = 'M')"+
-					"OR (SUBSTR(f1.weekly_schedule, 3, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 3, 1) = 'T')"+
-					"OR (SUBSTR(f1.weekly_schedule, 4, 1) = 'W' AND SUBSTR(f2.weekly_schedule, 4, 1) = 'W')"+
-					"OR (SUBSTR(f1.weekly_schedule, 5, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 5, 1) = 'T')"+
-					"OR (SUBSTR(f1.weekly_schedule, 6, 1) = 'F' AND SUBSTR(f2.weekly_schedule, 6, 1) = 'F')"+
-					"OR (SUBSTR(f1.weekly_schedule, 7, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 7, 1) = 'S'));";
+		    sql = "SELECT f1.Flight_number, f1.Airline_ID, f1.Departure_city, f1.Arrival_City, f1.Departure_time, f1.Arrival_time, " +
+		    			"f2.Flight_number, f2.Airline_ID, f2.Departure_city, f2.Arrival_City, f2.Departure_time, f2.Arrival_time " +
+				"FROM FLIGHT f1, FLIGHT f2 " +
+				"WHERE f1.Arrival_City = f2.Departure_city " +
+				"AND f1.Departure_city = '" + cityA + "' " +
+				"AND f2.Arrival_City = '" + cityB + "' " +
+				"AND (TO_NUMBER(f2.Departure_Time) - TO_NUMBER(f1.Arrival_time) > 100) " +
+				"AND ((SUBSTR(f1.weekly_schedule, 1, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 1, 1) = 'S') " +
+					"OR (SUBSTR(f1.weekly_schedule, 2, 1) = 'M' AND SUBSTR(f2.weekly_schedule, 2, 1) = 'M') " +
+					"OR (SUBSTR(f1.weekly_schedule, 3, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 3, 1) = 'T') " +
+					"OR (SUBSTR(f1.weekly_schedule, 4, 1) = 'W' AND SUBSTR(f2.weekly_schedule, 4, 1) = 'W') " +
+					"OR (SUBSTR(f1.weekly_schedule, 5, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 5, 1) = 'T') " +
+					"OR (SUBSTR(f1.weekly_schedule, 6, 1) = 'F' AND SUBSTR(f2.weekly_schedule, 6, 1) = 'F') " +
+					"OR (SUBSTR(f1.weekly_schedule, 7, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 7, 1) = 'S'))";
 			r = s.executeQuery(sql);
 
 			while (r.next()) {
-		    	System.out.println( r.getString(1) + " " + r.getString(2) + r.getString(3) + " " +r.getString(4) + " " +r.getString(5) + " " +r.getString(6) + "\n" +
-			      r.getString(7) + " " + r.getString(8) + r.getString(9) + " " +r.getString(10) + " " +r.getString(11) + " " +r.getString(12));
-		    	System.out.println();
-		    }
+				System.out.println("  Flight No: " + r.getString(1) + "  Airline ID: " + r.getString(2) + "  Departure City: " + r.getString(3) + "  Arrival City: " + r.getString(4) + "  Departure Time: " + r.getString(5) + "  Arrival Time: " + r.getString(6) + "\n" +
+			      "  Flight No: " + r.getString(7) + "  Airline ID: " + r.getString(8) + "  Departure City: " + r.getString(9) + "  Arrival City: " + r.getString(10) + "  Departure Time: " + r.getString(11) + "  Arrival Time: " + r.getString(12) + "\n");
+			  }
 
 		    r.close();
 		}
@@ -667,12 +663,10 @@ public class Driver {
 			      + "Depart: " + r.getString(3) + " Arrive " + r.getString(4) + " Depart Time: " + r.getString(5) + " Arrive Time: " + r.getString(6));
 		    }
 
-		    System.out.println();
-			System.out.println("Flights with one connection from " + cityA + " to " + cityB);
-			System.out.println();
+			System.out.println("\nFlights with one connection from " + cityA + " to " + cityB);
 
-		    sql = "SELECT f1.Flight_number, f1.Airline_ID, f1.Departure_city, f1.Arrival_City, f1.Departure_time, f1.Arrival_time, "+
-		    			"f2.Flight_number, f2.Airline_ID, f2.Departure_city, f2.Arrival_City, f2.Departure_time, f2.Arrival_time "+
+		    sql = "SELECT f1.Flight_Number, f1.Airline_ID, f1.Departure_City, f1.Arrival_City, f1.Departure_Time, f1.Arrival_Time, "+
+		    			"f2.Flight_Number, f2.Airline_ID, f2.Departure_City, f2.Arrival_City, f2.Departure_Time, f2.Arrival_Time "+
 				"FROM FLIGHT f1, FLIGHT f2 "+
 				"WHERE f1.Arrival_City = f2.Departure_city"+
 				"AND f1.Departure_city = '" + cityA + "'"+
@@ -686,7 +680,7 @@ public class Driver {
 					"OR (SUBSTR(f1.weekly_schedule, 4, 1) = 'W' AND SUBSTR(f2.weekly_schedule, 4, 1) = 'W')"+
 					"OR (SUBSTR(f1.weekly_schedule, 5, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 5, 1) = 'T')"+
 					"OR (SUBSTR(f1.weekly_schedule, 6, 1) = 'F' AND SUBSTR(f2.weekly_schedule, 6, 1) = 'F')"+
-					"OR (SUBSTR(f1.weekly_schedule, 7, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 7, 1) = 'S'));";
+					"OR (SUBSTR(f1.weekly_schedule, 7, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 7, 1) = 'S'))";
 			r = s.executeQuery(sql);
 
 			while (r.next()) {
