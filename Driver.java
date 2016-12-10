@@ -652,11 +652,7 @@ public class Driver {
 				"FROM Flight " +
 				"WHERE departure_city = '" + cityA + "' " +
 				"AND arrival_city = '" + cityB + "' " +
-<<<<<<< HEAD
-				"AND Airline_Abbreviation = '" + airline_abbreviation + "';";
-=======
-				"AND Airline_ID = '" + airline + "'";
->>>>>>> e8c0f8e3f60002919b3461f9ee417ca3722e25a4
+				"AND Airline_Abbreviation = '" + airline_abbreviation + "'";
 			ResultSet r = s.executeQuery(sql);
 
 			System.out.println("\nDirect flights from " + cityA + " to " + cityB + ":");
@@ -674,13 +670,10 @@ public class Driver {
 				"WHERE f1.Arrival_City = f2.Departure_city "+
 				"AND f1.Departure_city = '" + cityA + "' "+
 				"AND f2.Arrival_City = '" + cityB + "' "+
-<<<<<<< HEAD
 				"AND f1.Airline_Abbreviation = '" + airline_abbreviation + "' " +
 				"AND f2.Airline_Abbreviation = '" + airline_abbreviation + "' " +
-=======
 				"AND f1.Airline_ID = '" + airline + "' " +
 				"AND f2.Airline_ID = '" + airline + "' " +
->>>>>>> e8c0f8e3f60002919b3461f9ee417ca3722e25a4
 				"AND (TO_NUMBER(f2.Departure_Time) - TO_NUMBER(f1.Arrival_time) > 100) "+
 				"AND ((SUBSTR(f1.weekly_schedule, 1, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 1, 1) = 'S') "+
 					"OR (SUBSTR(f1.weekly_schedule, 2, 1) = 'M' AND SUBSTR(f2.weekly_schedule, 2, 1) = 'M') "+
@@ -688,11 +681,7 @@ public class Driver {
 					"OR (SUBSTR(f1.weekly_schedule, 4, 1) = 'W' AND SUBSTR(f2.weekly_schedule, 4, 1) = 'W') "+
 					"OR (SUBSTR(f1.weekly_schedule, 5, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 5, 1) = 'T') "+
 					"OR (SUBSTR(f1.weekly_schedule, 6, 1) = 'F' AND SUBSTR(f2.weekly_schedule, 6, 1) = 'F') "+
-<<<<<<< HEAD
-					"OR (SUBSTR(f1.weekly_schedule, 7, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 7, 1) = 'S'));";
-=======
 					"OR (SUBSTR(f1.weekly_schedule, 7, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 7, 1) = 'S'))";
->>>>>>> e8c0f8e3f60002919b3461f9ee417ca3722e25a4
 			r = s.executeQuery(sql);
 
 			while (r.next()) {
