@@ -235,7 +235,7 @@ public class Driver {
 						scan.skip("\n");
 						while (leg < 4) {
 							System.out.println("Enter flight number or [0] if you are finished");
-
+							
 							String flightNumber = scan.nextLine();
 							if (flightNumber.equals("0")) {
 								break;
@@ -244,6 +244,10 @@ public class Driver {
 							flights[leg] = flightNumber;
 							System.out.println("Enter date [MM-DD-YYYY]");
 							date = scan.nextLine();
+							if(full(flightNumber,date)) {
+								System.out.println("This flight is full, please try again");
+								break;
+							}
 							dates[leg] = date;
 							leg++;
 						}
@@ -267,9 +271,29 @@ public class Driver {
 						System.exit(0);
 					default:
 						System.out.println("Not a valid operation code");
-				}
 			}
 		}
+	}
+
+	private boolean full(String flight, String date){
+		try {
+			Statement s = connection.createStatement();
+			String sql = "SELECT capacity('"+flight+"') FROM flight WHERE flight_number = " + flight; 
+			ResultSet r = s.executeQuery(sql);
+			r.next();
+			int capacity = r.getInt(1);
+			sql = "SELECT reserved('"+flight+"', TO_DATE('"+date+"', 'MM-DD-YYYY')) FROM flight WHERE flight_number = " + flight;
+			r = s.executeQuery(sql);
+			r.next()
+			int reserved = r.getInt(1);
+			if(capacity == reserved) return true;
+			return false;
+		}
+		catch (Exception e) {
+			System.out.println("Error fetching the specified flight. " + e.toString());
+			return;
+		}
+	}
 
 
 	private void eraseDatabase() {
@@ -673,7 +697,7 @@ public class Driver {
 			Statement s = connection.createStatement();
 			String sql = "SELECT Flight_number, Airline_ID, Departure_city, Arrival_City, Departure_time, Arrival_time" +
 				"FROM Flight WHERE departure_city = '" + cityA + "' AND arrival_city = '" + cityB + "' AND " +
-				"(capacity(Flight_number) - reserved(Flight_number, TO_DATE('" + date + "', 'YYYY-MM-DD'))) > 0;";
+				"(capacity(Flight_number) - reserved(Flight_number, TO_DATE('" + date + "', 'MM-DD-YYYY'))) > 0;";
 			ResultSet r = s.executeQuery(sql);
 
 			System.out.println();
@@ -696,15 +720,15 @@ public class Driver {
 				"AND f1.Departure_city = '" + cityA + "'"+
 				"AND f2.Arrival_City = '" + cityB + "'"+
 				"AND (TO_NUMBER(f2.Departure_Time) - TO_NUMBER(f1.Arrival_time) > 100)"+
-				"AND (capacity(f1.Flight_number) - reserved(Flight_number, TO_DATE('" + date + "', 'YYYY-MM-DD'))) > 0" +
-				"AND (capacity(f2.Flight_number) - reserved(Flight_number, TO_DATE('" + date + "', 'YYYY-MM-DD'))) > 0" +
+				"AND (capacity(f1.Flight_number) - reserved(Flight_number, TO_DATE('" + date + "', 'MM-DD-YYYY'))) > 0" +
+				"AND (capacity(f2.Flight_number) - reserved(Flight_number, TO_DATE('" + date + "', 'MM-DD-YYYY'))) > 0" +
 				"AND ((SUBSTR(f1.weekly_schedule, 1, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 1, 1) = 'S')"+
 					"OR (SUBSTR(f1.weekly_schedule, 2, 1) = 'M' AND SUBSTR(f2.weekly_schedule, 2, 1) = 'M')"+
 					"OR (SUBSTR(f1.weekly_schedule, 3, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 3, 1) = 'T')"+
 					"OR (SUBSTR(f1.weekly_schedule, 4, 1) = 'W' AND SUBSTR(f2.weekly_schedule, 4, 1) = 'W')"+
 					"OR (SUBSTR(f1.weekly_schedule, 5, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 5, 1) = 'T')"+
 					"OR (SUBSTR(f1.weekly_schedule, 6, 1) = 'F' AND SUBSTR(f2.weekly_schedule, 6, 1) = 'F')"+
-					"OR (SUBSTR(f1.weekly_schedule, 7, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 7, 1) = 'S'));";
+					"OR (SUBSTR(f1.weekly_schedule, 7, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 7, 1) = 'S'))";
 			r = s.executeQuery(sql);
 
 			while (r.next()) {
@@ -725,7 +749,7 @@ public class Driver {
 			Statement s = connection.createStatement();
 			String sql = "SELECT Flight_number, Airline_ID, Departure_city, Arrival_City, Departure_time, Arrival_time" +
 				"FROM Flight WHERE departure_city = '" + cityA + "' AND arrival_city = '" + cityB + "' AND Airline_ID = '" + airline + "'" +
-				"(capacity(Flight_number) - reserved(Flight_number, TO_DATE('" + date + "', 'YYYY-MM-DD'))) > 0;";
+				"(capacity(Flight_number) - reserved(Flight_number, TO_DATE('" + date + "', 'MM-DD-YYYY'))) > 0;";
 			ResultSet r = s.executeQuery(sql);
 
 			System.out.println();
@@ -750,15 +774,15 @@ public class Driver {
 				"AND f1.Airline_ID = '" + airline + "'" +
 				"AND f2.Airline_ID = '" + airline + "'" +
 				"AND (TO_NUMBER(f2.Departure_Time) - TO_NUMBER(f1.Arrival_time) > 100)"+
-				"AND (capacity(f1.Flight_number) - reserved(Flight_number, TO_DATE('" + date + "', 'YYYY-MM-DD'))) > 0" +
-				"AND (capacity(f2.Flight_number) - reserved(Flight_number, TO_DATE('" + date + "', 'YYYY-MM-DD'))) > 0" +
+				"AND (capacity(f1.Flight_number) - reserved(Flight_number, TO_DATE('" + date + "', 'MM-DD-YYYY'))) > 0" +
+				"AND (capacity(f2.Flight_number) - reserved(Flight_number, TO_DATE('" + date + "', 'MM-DD-YYYY'))) > 0" +
 				"AND ((SUBSTR(f1.weekly_schedule, 1, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 1, 1) = 'S')"+
 					"OR (SUBSTR(f1.weekly_schedule, 2, 1) = 'M' AND SUBSTR(f2.weekly_schedule, 2, 1) = 'M')"+
 					"OR (SUBSTR(f1.weekly_schedule, 3, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 3, 1) = 'T')"+
 					"OR (SUBSTR(f1.weekly_schedule, 4, 1) = 'W' AND SUBSTR(f2.weekly_schedule, 4, 1) = 'W')"+
 					"OR (SUBSTR(f1.weekly_schedule, 5, 1) = 'T' AND SUBSTR(f2.weekly_schedule, 5, 1) = 'T')"+
 					"OR (SUBSTR(f1.weekly_schedule, 6, 1) = 'F' AND SUBSTR(f2.weekly_schedule, 6, 1) = 'F')"+
-					"OR (SUBSTR(f1.weekly_schedule, 7, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 7, 1) = 'S'));";
+					"OR (SUBSTR(f1.weekly_schedule, 7, 1) = 'S' AND SUBSTR(f2.weekly_schedule, 7, 1) = 'S'))";
 			r = s.executeQuery(sql);
 
 			while (r.next()) {
@@ -774,8 +798,118 @@ public class Driver {
 		}
 	}
 
-	private void addReservation(String flights[], String dates[]) {
+	private void addReservation(String flights[], String dates[]) { 
+	//asks the user for name and populates the reservation info with the customer's information
+	//determines high and low prices based on today's date: reservation date is today
+		try {
+			//get name
+			Scanner scan = new Scanner(System.in);
+		    System.out.println("Enter first name");
+		    String firstName = scan.nextLine();
+		    System.out.println("Enter last name");
+		    String lastName = scan.nextLine();
 
+			Statement s = connection.createStatement();
+			String sql = "SELECT CID, Credit_Card_Num, Frequent_Miles FROM Customer WHERE First_Name = '" + firstName + "' AND Last_Name = '" + lastName + "'";
+			ResultSet r = s.executeQuery(sql);
+
+			//check if customer exists
+			if (!r.isBeforeFirst() ) {    
+    			System.out.println("Customer not found. Please sign up as a customer"); 
+    			return;
+			}
+
+			//get customer info
+			r.next();
+			String cid = r.getString("CID");
+			String credit = r.getString("Credit_Card_Num");
+			String freq = r.getString("Frequent_Miles");
+
+			if(credit = null) credit = "";
+			if(freq = null) freq = "";
+
+
+			//get start and end cities for the whole reservation
+			sql = "SELECT Departure_city FROM Flight WHERE Flight_Number = '" + flights[0] + "'";
+			r = s.executeQuery(sql);
+			r.next();
+			String departure_city = r.getString("Departure_city");
+
+			sql = "SELECT Arrival_City FROM Flight WHERE Flight_Number = '" + flights[flights.length-1] + "'";
+			r = s.executeQuery(sql);
+			r.next();
+			String arrival_city = r.getString("Arrival_City");
+
+			sql = "SELECT TO_CHAR (SYSDATE, 'MM-DD-YYYY') "NOW" FROM DUAL";
+			r = s.executeQuery(sql);
+			r.next();
+			String today = r.getString("NOW");
+
+			//calculate totalPrice
+			int totalPrice = 0;
+			for(int i = 0; i < flights.length; i++){
+				sql = "SELECT Departure_City, Arrival_City, Airline_ID FROM Flight WHERE Flight_Number = '" + flights[i] + "'";
+				r = s.executeQuery(sql);
+				r.next();
+				String a_city = r.getString("Arrival_City");
+				String d_city = r.getString("Departure_City");
+				String airline = r.getString("Airline_ID");
+
+				//if same day flight, add high price, else add low price
+				if(dates[i].equals(today)
+					sql = "SELECT High_Price FROM Price WHERE Departure_city = '" + d_city + "' AND Arrival_City = '" + a_city + "' AND Airline_ID = '"+ airline + "'";
+				else
+					sql = "SELECT Low_Price FROM Price WHERE Departure_city = '" + d_city + "' AND Arrival_City = '" + a_city + "' AND Airline_ID = '"+ airline + "'";
+				
+				r = s.executeQuery(sql);
+				r.next();
+				int priceOfFlight = r.getInt("1");
+
+				//check if customer is frequent miles member of airline
+				if(freq.equals(airline))
+					priceOfFlight *= 9;
+					priceOfFlight /= 10;
+
+				totalPrice += priceOfFlight;
+			}
+
+			//generate random reservation number
+			String res_num;
+			Random r = new Random();
+			while(true){
+				int random = r.nextInt(100000)
+				res_num = String.format("%05d", String.parseInt(random));
+				sql = "SELECT * FROM Reservation WHERE Reservation_Number = '" + res_num + "'";
+				r = s.executeQuery(sql);
+				//check if resultSet is empty, if so, we've found a new reservation number
+				if (!r.isBeforeFirst()) break;
+			}
+
+			//insert flights into reservation_detail
+			for(int i = 0; i < flights.length; i++){
+				sql = "INSERT INTO Reservation_Detail VALUES('" + res_num + "', '"+ flights[i] + "', '" + dates[i] + "', " + Integer.toString(i) + ")";
+				r.executeQuery(sql);
+			}
+			
+			sql = "INSERT INTO Reservation VALUES('" + res_num + "', " + cid + "', " + Integer.toString(totalPrice) + ", '" + credit + "', TO_DATE('"+ today +"', 'MM-DD-YYYY')," + 
+				"'N', '" + departure_city + "', '"+ arrival_city + "')";
+
+			System.out.println();
+			System.out.println("Direct flights from " + cityA + " to " + cityB);
+			System.out.println();
+
+			while (r.next()) {
+		    	System.out.println("Flight Number: " + r.getString(1) + " Airline: " + r.getString(2) + " \n"
+			      + "Depart: " + r.getString(3) + " Arrive " + r.getString(4) + " Depart Time: " + r.getString(5) + " Arrive Time: " + r.getString(6));
+		    }
+
+		    System.out.println("Reservation number " + res_num + "confirmed");
+
+		    r.close();
+		}
+		catch (Exception e) {
+			System.out.println("Error creating reservation" + e.toString());
+		}
 	}
 
 	private void showReservation(String reservation) {
