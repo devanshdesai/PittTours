@@ -1,0 +1,1 @@
+SELECT * FROM Airline a INNER JOIN (SELECT Airline_ID, SUM(High_Price), SUM(Low_Price) FROM Price WHERE Departure_City = 'LAX' AND Arrival_City = 'PIT' OR Departure_City = 'PIT' AND Arrival_City = 'LAX' GROUP BY Airline_ID) p on a.Airline_ID = p.Airline_ID;
