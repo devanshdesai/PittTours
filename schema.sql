@@ -1,8 +1,13 @@
--- Devansh Desai & Kevin Zhang
--- CS 1555 - Pitt Tours Term Project
--- 11/28/2016
+/*
+    Devansh Desai & Kevin Zhang
+    dmd113 / kwz5
+    CS 1555 - Pitt Tours Term Project
+    11/28/2016
+*/
 
--- Remove all tables if they currently exist in the database
+/*
+    Remove all tables if they currently exist in the database
+*/
 DROP TABLE Airline CASCADE CONSTRAINTS;
 DROP TABLE Flight CASCADE CONSTRAINTS;
 DROP TABLE Plane CASCADE CONSTRAINTS;
@@ -12,7 +17,9 @@ DROP TABLE Reservation CASCADE CONSTRAINTS;
 DROP TABLE Reservation_Detail CASCADE CONSTRAINTS;
 DROP TABLE System_Date CASCADE CONSTRAINTS;
 
--- Start the creation of the database tables
+/*
+    Start the creation of the database tables
+*/
 CREATE TABLE Airline (
     Airline_ID varchar(5) NOT NULL,
     Airline_Name varchar(50) NOT NULL,
@@ -108,7 +115,13 @@ CREATE TABLE System_Date (
 );
 
 
--- Triggers
+
+/*
+    Triggers
+
+    adjustTicket will change the prices of the reservations on that Flight
+    if the cost is changed before the ticket is issued.
+*/
 CREATE OR REPLACE TRIGGER adjustTicket
     AFTER UPDATE OF High_Price, Low_Price ON Price
     FOR EACH ROW
@@ -127,6 +140,10 @@ CREATE OR REPLACE TRIGGER adjustTicket
 END;
 /
 
+/*
+    planeUpgrade will automatically change a flight to a larger plane if the number of
+    reservations made on that flight exceeds the current plane's capacity.
+*/
 CREATE OR REPLACE TRIGGER planeUpgrade
     AFTER INSERT ON Reservation_Detail
     FOR EACH ROW
@@ -151,6 +168,11 @@ CREATE OR REPLACE TRIGGER planeUpgrade
 END;
 /
 
+/*
+    cancelReservation will remove all customers' reservations if they have not bought a ticket
+    by 12 hours before the flight departs. If the new number of passengers on the flight can
+    fit into a smaller plane, the flight will be moved to that smaller plane.
+*/
 CREATE OR REPLACE TRIGGER cancelReservation
 	AFTER UPDATE ON System_Date
 	FOR EACH ROW
@@ -206,7 +228,10 @@ BEGIN
 END;
 /
 
-CREATE OR REPLACE PROCEDURE incrementClock (newDate IN date)
+/*
+    changeClock will change the "system time" of the program.
+*/
+CREATE OR REPLACE PROCEDURE changeClock (newDate IN date)
 IS
 BEGIN
     DELETE FROM System_Date;

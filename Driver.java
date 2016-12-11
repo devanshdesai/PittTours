@@ -40,10 +40,11 @@ public class Driver {
 					+ "[3] Load schedule information \n"
 					+ "[4] Load pricing information \n"
 					+ "[5] Load plane information \n"
-					+ "[6] Load all CSV files"
+					+ "[6] Load all CSV files \n"
 					+ "[7] Generate passenger manifest for specific Flight on given day \n"
-					+ "[8] Return to interface menu \n"
-					+ "[9] Exit");
+					+ "[8] Run tests of all tasks \n"
+					+ "[9] Return to interface menu \n"
+					+ "[10] Exit");
 				operation = scan.nextInt();
 				switch (operation) {
 					case 1:
@@ -116,7 +117,7 @@ public class Driver {
 					case 8:
 						testAllFunctions();
 						break;
-					case 8:
+					case 9:
 						return;
 					case 10:
 						System.exit(0);
@@ -358,7 +359,7 @@ public class Driver {
 				else if (name.equals("02plane.csv")) {
 					loadPlane(name);
 				}
-				else if (name.equals("03Flight.csv")) {
+				else if (name.equals("03flight.csv")) {
 					loadSchedule(name);
 				}
 				else if (name.equals("04price.csv")) {
@@ -514,11 +515,11 @@ public class Driver {
 		try {
 			System.out.println("\nDeleteing database...");
 			eraseDatabase();
-			System.out.println("\nFilling database tables...");
+			System.out.println("\nFilling database tables...\n");
 			loadAll();
-			System.out.println("\nAdding customer to database...");
+			System.out.println("\nAdding customer to database...\n");
 			addCustomer("Mr", "Devansh", "Desai", "1234567890123456", "12-31-2020", "4200 Fifth Ave", "Pittsburgh", "PA", "4125551234", "dmd113@pitt.edu", "00001");
-			System.out.println("\nDisplaying customer...");
+			System.out.println("Displaying customer...");
 			showCustomer("Devansh", "Desai");
 			System.out.println("\nFinding prices for flights between SFO and PIT...");
 			findPrice("SFO", "PIT");
@@ -531,18 +532,18 @@ public class Driver {
 			System.out.println("\nFinding all available seats for flights between SFO and PIT on 11-23-2016 on Delta Airines...");
 			availableSeats("SFO", "PIT", "11-23-2016", "DAL");
 			System.out.println("\nAdding reservation for flights #039 and #139 on 11-23-2016 for customer...");
-			String[] flights = new String[];
-			String[] dates = new String[];
-			flights.append("039");
-			flights.append("139");
-			dates.append("11-23-2016");
-			dates.append("11-23-2016");
+			String[] flights = new String[2];
+			String[] dates = new String[2];
+			flights[0] = "039";
+			flights[1] ="139";
+			dates[0] = "11-23-2016";
+			dates[1] = "11-23-2016";
 			String reservationNumber = addReservation(flights, dates, "Devansh", "Desai");
-			System.out.println("\nCost should be $336 at a high-price...");
+			System.out.println("\nCost should be $336 at a high price...");
 			System.out.println("\nShowing reservation #" + reservationNumber + "...");
 			showReservation(reservationNumber);
 			System.out.println("\nEnter [y] to buy at ticket and complete the test...");
-			buyTickets(reservationNumber)
+			buyTickets(reservationNumber);
 		}
 		catch (Exception e) {
 			System.out.println(e.toString());
@@ -625,7 +626,7 @@ public class Driver {
 			System.out.println("\n\nOne-way Flights from " + cityA + " to " + cityB + ":");
 			while (r.next()) {
 		    	System.out.println("  Departure City: " + r.getString("Departure_City") + "  Arrival City: " + r.getString("Arrival_City") + "  Airline: " + r.getString("Airline_Name") + " \n"
-			      + "    High Price: " + r.getLong("High_Price") + "  Low Price: " + r.getLong("Low_Price"));
+			      + "    High Price: $" + r.getLong("High_Price") + "  Low Price: $" + r.getLong("Low_Price"));
 		    }
 
 		    sql = "SELECT * FROM Price p INNER JOIN Airline a ON p.Airline_ID = a.Airline_ID WHERE p.Departure_City = '" + cityB + "' AND p.Arrival_City = '" + cityA + "'";
@@ -633,14 +634,14 @@ public class Driver {
 			System.out.println("\n\nOne-way Flights from " + cityB + " to " + cityA + ":");
 			while (r.next()) {
 		    	System.out.println("  Departure City: " + r.getString("Departure_City") + "  Arrival City: " + r.getString("Arrival_City") + "  Airline: " + r.getString("Airline_Name") + " \n"
-			      + "    High Price: " + r.getLong("High_Price") + "  Low Price: " + r.getLong("Low_Price"));
+			      + "    High Price: $" + r.getLong("High_Price") + "  Low Price: $" + r.getLong("Low_Price"));
 		    }
 
 			sql = "SELECT * FROM Airline a INNER JOIN (SELECT Airline_ID, SUM(High_Price) AS High, SUM(Low_Price) AS Low FROM Price p WHERE Departure_City = '" + cityA + "' AND Arrival_City = '" + cityB + "' OR Departure_City = '" + cityB + "' AND Arrival_City = '" + cityA + "' GROUP BY Airline_ID) p ON a.Airline_ID = p.Airline_ID";
 			r = s.executeQuery(sql);
 			System.out.println("\n\nRound-trip Flights between " + cityA + " to " + cityB + ":");
 			while (r.next()) {
-				System.out.println("  Airline: " + r.getString("Airline_Name") + " \n" + "    High Price: " + r.getLong("High") + "  Low Price: " + r.getLong("Low"));
+				System.out.println("  Airline: " + r.getString("Airline_Name") + " \n" + "    High Price: $" + r.getLong("High") + "  Low Price: $" + r.getLong("Low"));
 			}
 
 		    r.close();
@@ -866,15 +867,14 @@ public class Driver {
 	//asks the user for name and populates the reservation info with the customer's information
 	//determines high and low prices based on today's date: reservation date is today
 		try {
-			if (!firstName.equals("") && !lastName.equals("")) {
+			if (firstName.equals("") && lastName.equals("")) {
 				// get name
 				Scanner scan = new Scanner(System.in);
 			    System.out.println("Enter first name");
 			    firstName = scan.nextLine();
-			    System.oString ut.println("Enter last name");
+			    System.out.println("Enter last name");
 			    lastName = scan.nextLine();
 			}
-
 
 			Statement s = connection.createStatement();
 			String sql = "SELECT CID, Credit_Card_Num, Frequent_Miles FROM Customer WHERE First_Name = '" + firstName + "' AND Last_Name = '" + lastName + "'";
@@ -891,7 +891,7 @@ public class Driver {
 			}
 			else {
     			System.out.println("Customer not found. Please sign up as a customer.");
-    			return;
+    			return null;
 			}
 
 			if (credit == null) credit = "";
@@ -980,6 +980,8 @@ public class Driver {
 		catch (Exception e) {
 			System.out.println("Error creating Reservation" + e.toString());
 		}
+
+		return null;
 	}
 
 	private void showReservation(String reservationNumber) {
@@ -1024,7 +1026,7 @@ public class Driver {
 
 			//check if Reservation exists
 			if (!r.isBeforeFirst()) {
-    			System.out.println("Reservation number not found");
+    			System.out.println("Reservation #" + reservationNumber + " not found.");
     			return;
 			}
 
@@ -1032,7 +1034,7 @@ public class Driver {
 			String ccn = r.getString("Credit_Card_Num");
 			boolean newCCN = false;
 			if (ccn != null && ccn.length() == 16) {
-    			System.out.println("Would you like to use the credit card associated with your account? [y/n]");
+    			System.out.println("\nWould you like to use the credit card associated with your account? [y/n]");
     			String response = scan.nextLine();
     			if (response.equals("y")) newCCN = true;
 			}
@@ -1040,20 +1042,20 @@ public class Driver {
 			if (!newCCN) {
 				String newNumber;
 				while (true) {
-					System.out.println("Input your 16 digit credit card number");
+					System.out.println("\nInput your 16 digit credit card number.");
     				newNumber = scan.nextLine();
     				if (newNumber.length() == 16) break;
 					System.out.println("Invalid format");
 				}
 				sql = "UPDATE Reservation Set Credit_Card_Num = '" + newNumber + "' WHERE Reservation_Number = '" + reservationNumber + "'";
 				s.executeUpdate(sql);
-				System.out.println("Updated credit card number");
+				System.out.println("Updated credit card number.");
 			}
 
 			sql = "UPDATE Reservation Set Ticketed = 'Y' WHERE Reservation_Number = '" + reservationNumber + "'";
 			s.executeUpdate(sql);
 
-			System.out.println("Ticket bought");
+			System.out.println("\nYour ticket was purchased.");
 		}
 		catch (Exception e) {
 			System.out.println(e.toString());
