@@ -205,3 +205,11 @@ BEGIN
     RETURN (ct);
 END;
 /
+
+CREATE OR REPLACE PROCEDURE incrementClock (newDate IN date)
+IS
+BEGIN
+    DELETE FROM System_Date;
+    INSERT INTO System_Date VALUES (newDate);
+END;
+/

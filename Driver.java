@@ -327,6 +327,8 @@ public class Driver {
 			s.executeUpdate(sql);
 			sql = "DELETE FROM Airline";
 			s.executeUpdate(sql);
+			sql = "DELETE FROM System_Date";
+			s.executeUpdate(sql);
 
 			System.out.println("Database was deleted.");
 		}
