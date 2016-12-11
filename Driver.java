@@ -114,8 +114,11 @@ public class Driver {
 						passengerManifest(Flight, date);
 						break;
 					case 8:
+						testAllFunctions();
+						break;
+					case 8:
 						return;
-					case 9:
+					case 10:
 						System.exit(0);
 					default:
 						System.out.println("Not a valid operation code");
@@ -250,13 +253,14 @@ public class Driver {
 							System.out.println("Enter date [MM-DD-YYYY]");
 							date = scan.nextLine();
 
-							if (full(FlightNumber,date))
+							if (full(FlightNumber, date)) {
 								break;
+							}
 
 							dates[leg] = date;
 							leg++;
 						}
-						addReservation(flights,dates);
+						addReservation(flights, dates, "", "");
 						break;
 					case 9:
 						System.out.println("Enter Reservation number");
@@ -500,6 +504,45 @@ public class Driver {
 			while (r.next()) {
 				System.out.println(r.getString(1) + ". " + r.getString(2) + " " + r.getString(3));
 			}
+		}
+		catch (Exception e) {
+			System.out.println(e.toString());
+		}
+	}
+
+	private void testAllFunctions() {
+		try {
+			System.out.println("\nDeleteing database...");
+			eraseDatabase();
+			System.out.println("\nFilling database tables...");
+			loadAll();
+			System.out.println("\nAdding customer to database...");
+			addCustomer("Mr", "Devansh", "Desai", "1234567890123456", "12-31-2020", "4200 Fifth Ave", "Pittsburgh", "PA", "4125551234", "dmd113@pitt.edu", "00001");
+			System.out.println("\nDisplaying customer...");
+			showCustomer("Devansh", "Desai");
+			System.out.println("\nFinding prices for flights between SFO and PIT...");
+			findPrice("SFO", "PIT");
+			System.out.println("\nFinding all routes for flights between SFO and PIT...");
+			routesBetweenCities("SFO", "PIT");
+			System.out.println("\nFinding all routes for flights between SFO and PIT on Delta Airlines...");
+			routesBetweenCitiesOnAirline("SFO", "PIT", "DAL");
+			System.out.println("\nFinding all available seats for flights between SFO and PIT on 11-23-2016...");
+			availableSeats("SFO", "PIT", "11-23-2016");
+			System.out.println("\nFinding all available seats for flights between SFO and PIT on 11-23-2016 on Delta Airines...");
+			availableSeats("SFO", "PIT", "11-23-2016", "DAL");
+			System.out.println("\nAdding reservation for flights #039 and #139 on 11-23-2016 for customer...");
+			String[] flights = new String[];
+			String[] dates = new String[];
+			flights.append("039");
+			flights.append("139");
+			dates.append("11-23-2016");
+			dates.append("11-23-2016");
+			String reservationNumber = addReservation(flights, dates, "Devansh", "Desai");
+			System.out.println("\nCost should be $336 at a high-price...");
+			System.out.println("\nShowing reservation #" + reservationNumber + "...");
+			showReservation(reservationNumber);
+			System.out.println("\nEnter [y] to buy at ticket and complete the test...");
+			buyTickets(reservationNumber)
 		}
 		catch (Exception e) {
 			System.out.println(e.toString());
@@ -817,18 +860,21 @@ public class Driver {
 		}
 	}
 
-	private void addReservation(String flights[], String dates[]) {
+	private String addReservation(String flights[], String dates[], String firstName, String lastName) {
 
 	//all flight numbers in flights[] can be assume to be valid
 	//asks the user for name and populates the reservation info with the customer's information
 	//determines high and low prices based on today's date: reservation date is today
 		try {
-			//get name
-			Scanner scan = new Scanner(System.in);
-		    System.out.println("Enter first name");
-		    String firstName = scan.nextLine();
-		    System.out.println("Enter last name");
-		    String lastName = scan.nextLine();
+			if (!firstName.equals("") && !lastName.equals("")) {
+				// get name
+				Scanner scan = new Scanner(System.in);
+			    System.out.println("Enter first name");
+			    firstName = scan.nextLine();
+			    System.oString ut.println("Enter last name");
+			    lastName = scan.nextLine();
+			}
+
 
 			Statement s = connection.createStatement();
 			String sql = "SELECT CID, Credit_Card_Num, Frequent_Miles FROM Customer WHERE First_Name = '" + firstName + "' AND Last_Name = '" + lastName + "'";
@@ -904,41 +950,42 @@ public class Driver {
 			}
 
 			//generate random Reservation number
-			String res_num;
+			String reservationNumber;
 			Random ran = new Random();
 			while (true) {
 				int random = ran.nextInt(100000);
-				res_num = String.format("%05d", random);
-				sql = "SELECT * FROM Reservation WHERE Reservation_Number = '" + res_num + "'";
+				reservationNumber = String.format("%05d", random);
+				sql = "SELECT * FROM Reservation WHERE Reservation_Number = '" + reservationNumber + "'";
 				r = s.executeQuery(sql);
 				//check if resultSet is empty, if so, we've found a new Reservation number
 				if (!r.isBeforeFirst()) break;
 			}
 
 			//make new reservation
-			sql = "INSERT INTO Reservation VALUES('" + res_num + "', '" + cid + "', " + Integer.toString(totalPrice) + ", '" + credit + "', TO_DATE('"+ today +"', 'MM-DD-YYYY')," +
+			sql = "INSERT INTO Reservation VALUES('" + reservationNumber + "', '" + cid + "', " + Integer.toString(totalPrice) + ", '" + credit + "', TO_DATE('"+ today +"', 'MM-DD-YYYY')," +
 				"'N', '" + departureCity + "', '"+ arrivalCity + "')";
 			s.executeUpdate(sql);
 
 			//insert flights into reservation_detail
 			for(int i = 0; i < flightCount; i++){
-				sql = "INSERT INTO Reservation_Detail VALUES('" + res_num + "', '"+ flights[i] + "', TO_DATE('" + dates[i] + "', 'MM-DD-YYYY'), " + Integer.toString(i) + ")";
+				sql = "INSERT INTO Reservation_Detail VALUES('" + reservationNumber + "', '"+ flights[i] + "', TO_DATE('" + dates[i] + "', 'MM-DD-YYYY'), " + Integer.toString(i) + ")";
 				s.executeUpdate(sql);
 			}
 
-		    System.out.println("Reservation number " + res_num + " confirmed");
+		    System.out.println("Reservation number " + reservationNumber + " confirmed");
 
 		    r.close();
+		    return reservationNumber;
 		}
 		catch (Exception e) {
 			System.out.println("Error creating Reservation" + e.toString());
 		}
 	}
 
-	private void showReservation(String Reservation_number) {
+	private void showReservation(String reservationNumber) {
 		try {
 			Statement s = connection.createStatement();
-			String sql = "SELECT * FROM Reservation WHERE Reservation_Number = '" + Reservation_number + "'";
+			String sql = "SELECT * FROM Reservation WHERE Reservation_Number = '" + reservationNumber + "'";
 			ResultSet r = s.executeQuery(sql);
 
 			//check if Reservation exists
@@ -968,11 +1015,11 @@ public class Driver {
 		}
 	}
 
-	private void buyTickets(String Reservation_number) {
+	private void buyTickets(String reservationNumber) {
 		try {
 			Scanner scan = new Scanner(System.in);
 			Statement s = connection.createStatement();
-			String sql = "SELECT Credit_Card_Num FROM Reservation WHERE Reservation_Number = '" + Reservation_number + "'";
+			String sql = "SELECT Credit_Card_Num FROM Reservation WHERE Reservation_Number = '" + reservationNumber + "'";
 			ResultSet r = s.executeQuery(sql);
 
 			//check if Reservation exists
@@ -998,12 +1045,12 @@ public class Driver {
     				if (newNumber.length() == 16) break;
 					System.out.println("Invalid format");
 				}
-				sql = "UPDATE Reservation Set Credit_Card_Num = '" + newNumber + "' WHERE Reservation_Number = '" + Reservation_number + "'";
+				sql = "UPDATE Reservation Set Credit_Card_Num = '" + newNumber + "' WHERE Reservation_Number = '" + reservationNumber + "'";
 				s.executeUpdate(sql);
 				System.out.println("Updated credit card number");
 			}
 
-			sql = "UPDATE Reservation Set Ticketed = 'Y' WHERE Reservation_Number = '" + Reservation_number + "'";
+			sql = "UPDATE Reservation Set Ticketed = 'Y' WHERE Reservation_Number = '" + reservationNumber + "'";
 			s.executeUpdate(sql);
 
 			System.out.println("Ticket bought");
