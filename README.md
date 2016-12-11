@@ -6,9 +6,8 @@
 * Admin commands
 * Admin commands testing
 * Customer commands #1-4 implemented and tested
+* Triggers
 
 #### To Be Finished
-* cancelReservation trigger
-* Customer commands implementation #8-10
-* Customer commands testing #4-10
+* Test customer tasks #8 and #10
 * Stress test
