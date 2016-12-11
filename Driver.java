@@ -914,7 +914,7 @@ public class Driver {
 			r.next();
 			String arrivalCity = r.getString("Arrival_City");
 
-			sql = "SELECT TO_CHAR(SYSDATE, 'MM-DD-YYYY') NOW FROM DUAL";
+			sql = "SELECT C_Date FROM System_Date";
 			r = s.executeQuery(sql);
 			r.next();
 			String today = r.getString("NOW");
