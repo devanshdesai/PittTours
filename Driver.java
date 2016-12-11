@@ -235,7 +235,7 @@ public class Driver {
 						break;
 					case 8:
 						int leg = 0;
-						String Flights[] = new String[4];
+						String flights[] = new String[4];
 						String dates[] = new String[4];
 						scan.skip("\n");
 						while (leg < 4) {
@@ -246,7 +246,7 @@ public class Driver {
 								break;
 							}
 
-							Flights[leg] = FlightNumber;
+							flights[leg] = FlightNumber;
 							System.out.println("Enter date [MM-DD-YYYY]");
 							date = scan.nextLine();
 
@@ -256,7 +256,7 @@ public class Driver {
 							dates[leg] = date;
 							leg++;
 						}
-						addReservation(Flights,dates);
+						addReservation(flights,dates);
 						break;
 					case 9:
 						System.out.println("Enter Reservation number");
@@ -815,7 +815,7 @@ public class Driver {
 		}
 	}
 
-	private void addReservation(String Flights[], String dates[]) {
+	private void addReservation(String flights[], String dates[]) {
 	//asks the user for name and populates the Reservation info with the customer's information
 	//determines high and low prices based on today's date: Reservation date is today
 		try {
@@ -831,8 +831,8 @@ public class Driver {
 			ResultSet r = s.executeQuery(sql);
 
 			String cid = "";
-			String credit= "";
-			String freq= "";
+			String credit = "";
+			String freq = "";
 			//if customer exists
 			if (r.next()) {
 				cid = r.getString("CID");
@@ -840,73 +840,62 @@ public class Driver {
 				freq = r.getString("Frequent_Miles");
 			}
 			else {
-    			System.out.println("Customer not found. Please sign up as a customer");
+    			System.out.println("Customer not found. Please sign up as a customer.");
     			return;
 			}
 
 			if (credit == null) credit = "";
 			if (freq == null) freq = "";
 
-			//determine how many Flights there are
-			int FlightCount = 0;
-			for (int i = 0; i < Flights.length; i++) {
-				if (Flights[i] != null) FlightCount++;
+			// determine how many flights there are
+			int flightCount = 0;
+			for (int i = 0; i < flights.length; i++) {
+				if (flights[i] != null) flightCount++;
 			}
 
-			System.out.println("start+end cities");
 			//get start and end cities for the whole Reservation
-			sql = "SELECT Departure_City FROM Flight WHERE Flight_Number = '" + Flights[0] + "'";
+			sql = "SELECT Departure_City FROM Flight WHERE Flight_Number = '" + flights[0] + "'";
 			r = s.executeQuery(sql);
 			r.next();
-			String Departure_City = r.getString("Departure_City");
+			String departureCity = r.getString("Departure_City");
 
-			System.out.println("time2");
-
-			sql = "SELECT Arrival_City FROM Flight WHERE Flight_Number = '" + Flights[FlightCount-1] + "'";
+			sql = "SELECT Arrival_City FROM Flight WHERE Flight_Number = '" + flights[flightCount-1] + "'";
 			r = s.executeQuery(sql);
 			r.next();
-			String Arrival_City = r.getString("Arrival_City");
+			String arrivalCity = r.getString("Arrival_City");
 
-			System.out.println("time");
-
-			sql = "SELECT TO_CHAR (SYSDATE, 'MM-DD-YYYY') NOW FROM DUAL";
+			sql = "SELECT TO_CHAR(SYSDATE, 'MM-DD-YYYY') NOW FROM DUAL";
 			r = s.executeQuery(sql);
 			r.next();
 			String today = r.getString("NOW");
 
-			System.out.println("price");
-
 			//calculate totalPrice
 			int totalPrice = 0;
-			for (int i = 0; i < FlightCount; i++) {
-			System.out.println(i);
-
-				sql = "SELECT Departure_City, Arrival_City, Airline_ID FROM Flight WHERE Flight_Number = '" + Flights[i] + "'";
+			for (int i = 0; i < flightCount; i++) {
+				System.out.println(i);
+				sql = "SELECT Departure_City, Arrival_City, Airline_ID FROM Flight WHERE Flight_Number = '" + flights[i] + "'";
 				r = s.executeQuery(sql);
 				r.next();
 				String a_city = r.getString("Arrival_City");
 				String d_city = r.getString("Departure_City");
 				String airline = r.getString("Airline_ID");
-			System.out.println(i);
+				System.out.println(airline);
 				//if same day Flight, add high price, else add low price
 				if (dates[i].equals(today)) {
-
 					sql = "SELECT High_Price FROM Price WHERE Departure_City = '" + d_city + "' AND Arrival_City = '" + a_city + "' AND Airline_ID = '" + airline + "'";
 				}
 				else {
 					sql = "SELECT Low_Price FROM Price WHERE Departure_City = '" + d_city + "' AND Arrival_City = '" + a_city + "' AND Airline_ID = '" + airline + "'";
-			System.out.println(sql);
 				}
-
 				r = s.executeQuery(sql);
 				r.next();
-				int priceOfFlight = r.getInt("1");
+				int priceOfFlight = r.getInt(1);
 
 				//check if customer is frequent miles member of airline
-				if (freq.equals(airline))
+				if (freq.equals(airline)) {
 					priceOfFlight *= 9;
 					priceOfFlight /= 10;
-
+				}
 				totalPrice += priceOfFlight;
 			}
 
@@ -924,17 +913,17 @@ public class Driver {
 				if (!r.isBeforeFirst()) break;
 			}
 
-			//insert Flights into Reservation_Detail
-			for (int i = 0; i < FlightCount; i++) {
-				sql = "INSERT INTO Reservation_Detail VALUES('" + res_num + "', '" + Flights[i] + "', '" + dates[i] + "', " + Integer.toString(i) + ")";
+			//insert flights into Reservation_Detail
+			for (int i = 0; i < flightCount; i++) {
+				sql = "INSERT INTO Reservation_Detail VALUES('" + res_num + "', '" + flights[i] + "', '" + dates[i] + "', " + Integer.toString(i) + ")";
 				s.executeUpdate(sql);
 			}
 
 			sql = "INSERT INTO Reservation VALUES('" + res_num + "', " + cid + "', " + Integer.toString(totalPrice) + ", '" + credit + "', TO_DATE('" + today + "', 'MM-DD-YYYY')," +
-				"'N', '" + Departure_City + "', '" + Arrival_City + "')";
+				" 'N', '" + departureCity + "', '" + arrivalCity + "')";
 			s.executeUpdate(sql);
 
-		    System.out.println("Reservation number " + res_num + "confirmed");
+		    System.out.println("Reservation number " + res_num + " confirmed");
 
 		    r.close();
 		}
