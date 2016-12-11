@@ -19,6 +19,7 @@ public class Driver {
     private String query;
 
 	public Driver() {
+		// The very first menu that appears to choose between user and administrator.
 		while (true) {
 			System.out.println("\nAdministrator interface: press [1] and [return] \nUser interface: press [2] and [return].");
 			Scanner scan = new Scanner(System.in);
@@ -29,6 +30,7 @@ public class Driver {
 		}
 	}
 
+	// Main menu of the administrator
 	void admin() {
 		Scanner scan = new Scanner(System.in);
 		int operation = 0;
@@ -126,6 +128,8 @@ public class Driver {
 			}
 		}
 	}
+
+	// Main menu of the user
 	void user() {
 		Scanner scan = new Scanner(System.in);
 		int operation = 0;
@@ -285,36 +289,37 @@ public class Driver {
 		}
 	}
 
-	private boolean full(String Flight, String date) {
+	// Checks if a flight is full
+	private boolean full(String flight, String date) {
 		try {
 			Statement s = connection.createStatement();
-			String sql = "SELECT capacity('" + Flight + "') FROM Flight WHERE Flight_Number = " + Flight;
+			String sql = "SELECT capacity('" + flight + "') FROM Flight WHERE Flight_Number = " + flight;
 			ResultSet r = s.executeQuery(sql);
 			if (r.next()) {
 				int capacity = r.getInt(1);
-				sql = "SELECT reserved('" + Flight + "', TO_DATE('" +date+ "', 'MM-DD-YYYY')) FROM Flight WHERE Flight_Number = " + Flight;
+				sql = "SELECT reserved('" + flight + "', TO_DATE('" +date+ "', 'MM-DD-YYYY')) FROM Flight WHERE Flight_Number = " + flight;
 				r = s.executeQuery(sql);
 				r.next();
 				int reserved = r.getInt(1);
 				if (capacity == reserved) {
-					System.out.println("This Flight is full");
+					System.out.println("This flight is full");
 					return true;
 				}
 			}
 			else {
-				System.out.println("Invalid Flight number");
+				System.out.println("Invalid flight number");
 				return true;
 			}
 
 			return false;
 		}
 		catch (Exception e) {
-			System.out.println("Error fetching the specified Flight. " + e.toString());
+			System.out.println("Error fetching the specified flight. " + e.toString());
 			return true;
 		}
 	}
 
-
+	// Erases all tuples from the airline database.
 	private void eraseDatabase() {
 		try {
 			Statement s = connection.createStatement();
@@ -342,6 +347,8 @@ public class Driver {
 		}
 	}
 
+	// Loads all of the .CSV files in the directory for the Airline, Plane,
+	// Flight, and Price tables.
 	private void loadAll() {
 		try {
 			String directory = new java.io.File(".").getCanonicalPath();
@@ -372,6 +379,7 @@ public class Driver {
 		}
 	}
 
+	// Loads the Airline CSV
 	private void loadAirline(String filename) {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(filename));
@@ -400,6 +408,7 @@ public class Driver {
 		}
 	}
 
+	// Loads the Flight CSV
 	private void loadSchedule(String filename) {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(filename));
@@ -428,6 +437,7 @@ public class Driver {
 		}
 	}
 
+	// Loads the Price CSV
 	private void loadPrice(String filename) {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(filename));
@@ -456,6 +466,7 @@ public class Driver {
 		}
 	}
 
+	// Changes the price of the specified flight to the specifed high and low prices
 	private void changePrice(String departure, String arrival, String airline, int high, int low) {
 		try {
 			Statement s = connection.createStatement();
@@ -468,6 +479,7 @@ public class Driver {
 		}
 	}
 
+	// Loads the Plane CSV
 	private void loadPlane(String filename) {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(filename));
@@ -496,10 +508,11 @@ public class Driver {
 		}
 	}
 
-	private void passengerManifest(String FlightNumber, String date) {
+	// Generates a list of all of the passengerse for the given flight number and date.
+	private void passengerManifest(String flightNumber, String date) {
 		try {
 			Statement s = connection.createStatement();
-			String sql = "SELECT Salutation, First_Name, Last_Name FROM Customer c INNER JOIN Reservation r ON c.CID = r.CID INNER JOIN Reservation_Detail rd ON r.Reservation_Number = rd.Reservation_Number WHERE rd.Flight_Number = '" + FlightNumber + "' AND Flight_Date = TO_DATE('" + date + "','MM-DD-YYYY')";
+			String sql = "SELECT Salutation, First_Name, Last_Name FROM Customer c INNER JOIN Reservation r ON c.CID = r.CID INNER JOIN Reservation_Detail rd ON r.Reservation_Number = rd.Reservation_Number WHERE rd.Flight_Number = '" + flightNumber + "' AND Flight_Date = TO_DATE('" + date + "','MM-DD-YYYY')";
 			ResultSet r = s.executeQuery(sql);
 
 			while (r.next()) {
@@ -511,6 +524,7 @@ public class Driver {
 		}
 	}
 
+	// A testing method that tests all of the functions of the program.
 	private void testAllFunctions() {
 		try {
 			System.out.println("\nDeleteing database...");
@@ -550,6 +564,7 @@ public class Driver {
 		}
 	}
 
+	// Add specified customer to the database Customer table
 	private void addCustomer(String salutation, String first, String last, String credit, String creditExpire, String street, String city, String state, String phone, String email, String freqFlyer) {
 		try {
 			Statement s = connection.createStatement();
@@ -586,6 +601,7 @@ public class Driver {
 		}
 	}
 
+	// Display the specified customer's information
 	private void showCustomer(String first, String last) {
 		try {
 			Statement s = connection.createStatement();
@@ -618,6 +634,7 @@ public class Driver {
 		}
 	}
 
+	// Find the prices of all of the flights between two given cities.
 	private void findPrice(String cityA, String cityB) {
 		try {
 			Statement s = connection.createStatement();
@@ -651,6 +668,7 @@ public class Driver {
 		}
 	}
 
+	// Find all of the flights between two cities.
 	private void routesBetweenCities(String cityA, String cityB) {
 		try {
 			Statement s = connection.createStatement();
@@ -695,6 +713,7 @@ public class Driver {
 		}
 	}
 
+	// Find all of the flights between two cities restricted to a certain airline
 	private void routesBetweenCitiesOnAirline(String cityA, String cityB, String airline_abbreviation) {
 		try {
 
@@ -757,6 +776,7 @@ public class Driver {
 		}
 	}
 
+	// Find all of the flights between two cities restricted to a certain date.
 	private void availableSeats(String cityA, String cityB, String date) {
 		try {
 			Statement s = connection.createStatement();
@@ -801,6 +821,7 @@ public class Driver {
 		}
 	}
 
+	// Find all of the flights between two cities restricted to a certain airline and date
 	private void availableSeats(String cityA, String cityB, String date, String airline_abbreviation) {
 		try {
 			Statement s = connection.createStatement();
@@ -861,11 +882,11 @@ public class Driver {
 		}
 	}
 
+	// Create a reservation given a list of flights, dates, and the customer's name.
 	private String addReservation(String flights[], String dates[], String firstName, String lastName) {
-
-	//all flight numbers in flights[] can be assume to be valid
-	//asks the user for name and populates the reservation info with the customer's information
-	//determines high and low prices based on today's date: reservation date is today
+	// All flight numbers in flights[] can be assume to be valid
+	// Asks the user for name and populates the reservation info with the customer's information
+	// Determines high and low prices based on today's date: reservation date is today
 		try {
 			if (firstName.equals("") && lastName.equals("")) {
 				// get name
@@ -883,7 +904,7 @@ public class Driver {
 			String cid = "";
 			String credit = "";
 			String freq = "";
-			//if customer exists
+			// If customer exists, get their information.
 			if (r.next()) {
 				cid = r.getString("CID");
 				credit = r.getString("Credit_Card_Num");
@@ -897,13 +918,13 @@ public class Driver {
 			if (credit == null) credit = "";
 			if (freq == null) freq = "";
 
-			// determine how many flights there are
+			// Determine how many flights there are
 			int flightCount = 0;
 			for (int i = 0; i < flights.length; i++) {
 				if (flights[i] != null) flightCount++;
 			}
 
-			//get start and end cities for the whole Reservation
+			// Get start and end cities for the entire Reservation
 			sql = "SELECT Departure_City FROM Flight WHERE Flight_Number = '" + flights[0] + "'";
 			r = s.executeQuery(sql);
 			r.next();
@@ -919,7 +940,7 @@ public class Driver {
 			r.next();
 			String today = r.getString("NOW");
 
-			//calculate totalPrice
+			// Calculate totalPrice
 			int totalPrice = 0;
 
 			for(int i = 0; i < flightCount; i++){
@@ -930,7 +951,7 @@ public class Driver {
 				String d_city = r.getString("Departure_City");
 				String airline = r.getString("Airline_ID");
 
-				//if same day Flight, add high price, else add low price
+				// If same day Flight, add high price, else add low price
 				if (dates[i].equals(today)) {
 					sql = "SELECT High_Price FROM Price WHERE Departure_City = '" + d_city + "' AND Arrival_City = '" + a_city + "' AND Airline_ID = '" + airline + "'";
 				}
@@ -941,7 +962,7 @@ public class Driver {
 				r.next();
 				int priceOfFlight = r.getInt(1);
 
-				//check if customer is frequent miles member of airline
+				// Check if customer is frequent miles member of airline
 				if (freq.equals(airline)) {
 					priceOfFlight *= 9;
 					priceOfFlight /= 10;
@@ -949,7 +970,7 @@ public class Driver {
 				totalPrice += priceOfFlight;
 			}
 
-			//generate random Reservation number
+			// Generate random Reservation number
 			String reservationNumber;
 			Random ran = new Random();
 			while (true) {
@@ -957,16 +978,16 @@ public class Driver {
 				reservationNumber = String.format("%05d", random);
 				sql = "SELECT * FROM Reservation WHERE Reservation_Number = '" + reservationNumber + "'";
 				r = s.executeQuery(sql);
-				//check if resultSet is empty, if so, we've found a new Reservation number
+				// Check if resultSet is empty, if so, we've found a new Reservation number
 				if (!r.isBeforeFirst()) break;
 			}
 
-			//make new reservation
+			// Make new reservation
 			sql = "INSERT INTO Reservation VALUES('" + reservationNumber + "', '" + cid + "', " + Integer.toString(totalPrice) + ", '" + credit + "', TO_DATE('"+ today +"', 'MM-DD-YYYY')," +
 				"'N', '" + departureCity + "', '"+ arrivalCity + "')";
 			s.executeUpdate(sql);
 
-			//insert flights into reservation_detail
+			// Insert flights into reservation_detail
 			for(int i = 0; i < flightCount; i++){
 				sql = "INSERT INTO Reservation_Detail VALUES('" + reservationNumber + "', '"+ flights[i] + "', TO_DATE('" + dates[i] + "', 'MM-DD-YYYY'), " + Integer.toString(i) + ")";
 				s.executeUpdate(sql);
@@ -984,13 +1005,14 @@ public class Driver {
 		return null;
 	}
 
+	// Show all information related to a given reservation number.
 	private void showReservation(String reservationNumber) {
 		try {
 			Statement s = connection.createStatement();
 			String sql = "SELECT * FROM Reservation WHERE Reservation_Number = '" + reservationNumber + "'";
 			ResultSet r = s.executeQuery(sql);
 
-			//check if Reservation exists
+			// Check if Reservation exists
 			if (!r.isBeforeFirst() ) {
     			System.out.println("Reservation number not found");
     			return;
@@ -1017,6 +1039,7 @@ public class Driver {
 		}
 	}
 
+	// Buy the ticket for the customer given a reservation number.
 	private void buyTickets(String reservationNumber) {
 		try {
 			Scanner scan = new Scanner(System.in);
@@ -1038,7 +1061,7 @@ public class Driver {
     			String response = scan.nextLine();
     			if (response.equals("y")) newCCN = true;
 			}
-			//change credit card number
+			// Change credit card number
 			if (!newCCN) {
 				String newNumber;
 				while (true) {
@@ -1062,7 +1085,7 @@ public class Driver {
 		}
 	}
 
-
+	// Connect to the database and start the UI
 	public static void main(String args[]) throws SQLException {
 		String username = "kwz5";
 		String password = "asdfj";

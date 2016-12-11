@@ -10,6 +10,5 @@
 * Added stored procedure
 
 #### To Be Finished
-* Test customer tasks #8 and #10
+* High/low price implementation
 * Stress test
-* Use stored procedure
