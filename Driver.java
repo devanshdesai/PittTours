@@ -830,6 +830,7 @@ public class Driver {
 	}
 
 	private void addReservation(String flights[], String dates[]) {
+	//all flight numbers in flights[] can be assume to be valid
 	//asks the user for name and populates the reservation info with the customer's information
 	//determines high and low prices based on today's date: reservation date is today
 		try {
@@ -867,21 +868,16 @@ public class Driver {
 				if(flights[i] != null) flightCount++;
 			}
 
-			System.out.println("start+end cities");
 			//get start and end cities for the whole reservation
 			sql = "SELECT Departure_city FROM Flight WHERE Flight_Number = '" + flights[0] + "'";
 			r = s.executeQuery(sql);
 			r.next();
 			String departure_city = r.getString("Departure_city");
 
-			System.out.println("time2");
-
 			sql = "SELECT Arrival_City FROM Flight WHERE Flight_Number = '" + flights[flightCount-1] + "'";
 			r = s.executeQuery(sql);
 			r.next();
 			String arrival_city = r.getString("Arrival_City");
-
-			System.out.println("time");
 
 			sql = "SELECT TO_CHAR (SYSDATE, 'MM-DD-YYYY') NOW FROM DUAL";
 			r = s.executeQuery(sql);
@@ -893,28 +889,23 @@ public class Driver {
 			//calculate totalPrice
 			int totalPrice = 0;
 			for(int i = 0; i < flightCount; i++){
-			System.out.println(i);
-
 				sql = "SELECT Departure_City, Arrival_City, Airline_ID FROM Flight WHERE Flight_Number = '" + flights[i] + "'";
 				r = s.executeQuery(sql);
 				r.next();
 				String a_city = r.getString("Arrival_City");
 				String d_city = r.getString("Departure_City");
 				String airline = r.getString("Airline_ID");
-			System.out.println(i);
 				//if same day flight, add high price, else add low price
 				if(dates[i].equals(today)) {
-
 					sql = "SELECT High_Price FROM Price WHERE Departure_City = '" + d_city + "' AND Arrival_City = '" + a_city + "' AND Airline_ID = '"+ airline + "'";
 				}
 				else{
 					sql = "SELECT Low_Price FROM Price WHERE Departure_City = '" + d_city + "' AND Arrival_City = '" + a_city + "' AND Airline_ID = '"+ airline + "'";
-			System.out.println(sql);
 				}
 
 				r = s.executeQuery(sql);
 				r.next();
-				int priceOfFlight = r.getInt("1");
+				int priceOfFlight = r.getInt(1);
 
 				//check if customer is frequent miles member of airline
 				if(freq.equals(airline))
@@ -924,31 +915,30 @@ public class Driver {
 				totalPrice += priceOfFlight;
 			}
 
-			System.out.println("ran");
-
 			//generate random reservation number
 			String res_num;
 			Random ran = new Random();
 			while(true){
 				int random = ran.nextInt(100000);
-				res_num = String.format("%05d", Integer.toString(random));
+				res_num = String.format("%05d", random);
 				sql = "SELECT * FROM Reservation WHERE Reservation_Number = '" + res_num + "'";
 				r = s.executeQuery(sql);
 				//check if resultSet is empty, if so, we've found a new reservation number
 				if (!r.isBeforeFirst()) break;
 			}
 
-			//insert flights into reservation_detail
-			for(int i = 0; i < flightCount; i++){
-				sql = "INSERT INTO Reservation_Detail VALUES('" + res_num + "', '"+ flights[i] + "', '" + dates[i] + "', " + Integer.toString(i) + ")";
-				s.executeUpdate(sql);
-			}
-
-			sql = "INSERT INTO Reservation VALUES('" + res_num + "', " + cid + "', " + Integer.toString(totalPrice) + ", '" + credit + "', TO_DATE('"+ today +"', 'MM-DD-YYYY')," +
+			//make new reservation
+			sql = "INSERT INTO Reservation VALUES('" + res_num + "', '" + cid + "', " + Integer.toString(totalPrice) + ", '" + credit + "', TO_DATE('"+ today +"', 'MM-DD-YYYY')," +
 				"'N', '" + departure_city + "', '"+ arrival_city + "')";
 			s.executeUpdate(sql);
 
-		    System.out.println("Reservation number " + res_num + "confirmed");
+			//insert flights into reservation_detail
+			for(int i = 0; i < flightCount; i++){
+				sql = "INSERT INTO Reservation_Detail VALUES('" + res_num + "', '"+ flights[i] + "', TO_DATE('" + dates[i] + "', 'MM-DD-YYYY'), " + Integer.toString(i) + ")";
+				s.executeUpdate(sql);
+			}
+
+		    System.out.println("Reservation number " + res_num + " confirmed");
 
 		    r.close();
 		}
