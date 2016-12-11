@@ -902,6 +902,28 @@ public class Driver {
 			}
 
 			Statement s = connection.createStatement();
+
+/*	need DBA priviledge to run isReservationLocked because it accesses V$Locked_object table
+			while(isReservationLocked()){
+				int i = 0;
+				while (i<60) {            
+				    Thread.sleep(1000);    //Sleep one second
+				    i++;                   
+   				}
+			}
+
+			//after locks are unlocked, recheck if all flights are still available
+			for(int i = 0; i < flights.length; i++){
+				if(full(flights[i], dates[i])){
+   					System.out.println("Sorry, flight " + flights[i] + " on this date has reached capacity");
+					return null;
+				}
+   			}
+*/
+
+			String lock = "LOCK TABLE Reservation, Reservation_Detail IN EXCLUSIVE MODE";
+			s.execute(lock);
+
 			String sql = "SELECT CID, Credit_Card_Num, Frequent_Miles FROM Customer WHERE First_Name = '" + firstName + "' AND Last_Name = '" + lastName + "'";
 			ResultSet r = s.executeQuery(sql);
 
@@ -1071,6 +1093,7 @@ public class Driver {
 
 		    System.out.println("Reservation #" + reservationNumber + " confirmed");
 
+		    connection.commit();
 		    r.close();
 		    return reservationNumber;
 		}
@@ -1079,6 +1102,29 @@ public class Driver {
 		}
 
 		return null;
+	}
+
+	//not in use: requires DBA privileges 
+	//returns whether the reservation tables are being used
+	private boolean isReservationLocked(){
+		try {
+			Statement s = connection.createStatement();
+			String checkLocks = "SELECT B.Object_Name FROM V$Locked_Object A, All_Objects B WHERE A.Object_ID = B.Object_ID";
+			ResultSet r = s.executeQuery(checkLocks);
+			boolean locked = false;
+
+			while(r.next()) {
+				if(r.getString(1).equals("Reservation") || r.getString(1).equals("Reservation_Detail")) {
+					locked = true;
+					break;
+				}			
+			}
+			return locked;
+		}
+		catch (Exception e) {
+			System.out.println(e.toString());
+		}
+		return false;
 	}
 
 	// Show all information related to a given reservation number.
