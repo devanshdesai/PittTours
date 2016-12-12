@@ -1,9 +1,14 @@
 import java.sql.*;
-import java.util.*;
-import java.io.*;
+import java.util.Scanner;
+import java.util.Random;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-
+import java.io.File;
+import java.io.FilenameFilter;
 //import java.text.ParseException;
 
 public class Driver {
@@ -107,7 +112,7 @@ public class Driver {
 						System.out.println("Enter Flight number");
 						scan.skip("\n");
 						String Flight = scan.nextLine();
-						System.out.println("Enter date [MM-dd-yyyy]");
+						System.out.println("Enter date [MM-DD-YYYY]");
 						String date = scan.nextLine();
 						passengerManifest(Flight, date);
 						break;
@@ -163,7 +168,7 @@ public class Driver {
 						last = scan.nextLine();
 						System.out.println("Enter customer's credit card number (Format: 16 digits)");
 						String cc = scan.nextLine();
-						System.out.println("Enter customer's credit card expiration date (Format: 'MM-dd-yyyy')");
+						System.out.println("Enter customer's credit card expiration date (Format: 'MM-DD-YYYY')");
 						String ccExpire = scan.nextLine();
 						System.out.println("Enter customer's street address");
 						String street = scan.nextLine();
@@ -220,7 +225,7 @@ public class Driver {
 						cityA = scan.nextLine();
 						System.out.println("Enter end city");
 						cityB = scan.nextLine();
-						System.out.println("Enter date [MM-dd-yyyy]");
+						System.out.println("Enter date [MM-DD-YYYY]");
 						date = scan.nextLine();
 						availableSeats(cityA, cityB, date);
 						break;
@@ -230,7 +235,7 @@ public class Driver {
 						cityA = scan.nextLine();
 						System.out.println("Enter end city");
 						cityB = scan.nextLine();
-						System.out.println("Enter date [MM-dd-yyyy]");
+						System.out.println("Enter date [MM-DD-YYYY]");
 						date = scan.nextLine();
 						System.out.println("Enter airline code (eg. AAL)");
 						airline = scan.nextLine();
@@ -250,7 +255,7 @@ public class Driver {
 							}
 
 							flights[leg] = FlightNumber;
-							System.out.println("Enter date [MM-dd-yyyy]");
+							System.out.println("Enter date [MM-DD-YYYY]");
 							date = scan.nextLine();
 
 							if (full(FlightNumber, date)) {
@@ -292,7 +297,7 @@ public class Driver {
 			ResultSet r = s.executeQuery(sql);
 			if (r.next()) {
 				int capacity = r.getInt(1);
-				sql = "SELECT reserved('" + flight + "', TO_DATE('" +date+ "', 'MM-dd-yyyy')) FROM Flight WHERE Flight_Number = " + flight;
+				sql = "SELECT reserved('" + flight + "', TO_DATE('" +date+ "', 'MM-DD-YYYY')) FROM Flight WHERE Flight_Number = " + flight;
 				r = s.executeQuery(sql);
 				r.next();
 				int reserved = r.getInt(1);
@@ -353,29 +358,20 @@ public class Driver {
 	                      { return filename.endsWith(".csv"); }
 	        } );
 
-			int csvCounter = 0;
 			for (int i = 0; i < allCSV.length; i++) {
 				String name = allCSV[i].getName();
 				if (name.equals("01airline.csv")) {
 					loadAirline(name);
-					csvCounter += 1;
 				}
 				else if (name.equals("02plane.csv")) {
 					loadPlane(name);
-					csvCounter += 1;
 				}
 				else if (name.equals("03flight.csv")) {
 					loadSchedule(name);
-					csvCounter += 1;
 				}
 				else if (name.equals("04price.csv")) {
 					loadPrice(name);
-					csvCounter += 1;
 				}
-			}
-
-			if (csvCounter != 4) {
-				System.out.println("WARNING: Not all CSV files were loaded!");
 			}
 		}
 		catch (IOException e) {
@@ -494,7 +490,7 @@ public class Driver {
 
 			while ((line = br.readLine()) != null) {
 				plane = line.split(",");
-				sql = "INSERT INTO Plane VALUES('" + plane[0] + "', '" + plane[1] + "', " + plane[2] + ", TO_DATE('" + plane[3] + "', 'MM-dd-yyyy'), " + plane[4]  + ", '" + plane[5] + "')";
+				sql = "INSERT INTO Plane VALUES('" + plane[0] + "', '" + plane[1] + "', " + plane[2] + ", TO_DATE('" + plane[3] + "', 'MM-DD-YYYY'), " + plane[4]  + ", '" + plane[5] + "')";
 				s.executeUpdate(sql);
 			}
 
@@ -516,7 +512,7 @@ public class Driver {
 	private void passengerManifest(String flightNumber, String date) {
 		try {
 			Statement s = connection.createStatement();
-			String sql = "SELECT Salutation, First_Name, Last_Name FROM Customer c INNER JOIN Reservation r ON c.CID = r.CID INNER JOIN Reservation_Detail rd ON r.Reservation_Number = rd.Reservation_Number WHERE rd.Flight_Number = '" + flightNumber + "' AND Flight_Date = TO_DATE('" + date + "','MM-dd-yyyy')";
+			String sql = "SELECT Salutation, First_Name, Last_Name FROM Customer c INNER JOIN Reservation r ON c.CID = r.CID INNER JOIN Reservation_Detail rd ON r.Reservation_Number = rd.Reservation_Number WHERE rd.Flight_Number = '" + flightNumber + "' AND Flight_Date = TO_DATE('" + date + "','MM-DD-YYYY')";
 			ResultSet r = s.executeQuery(sql);
 
 			while (r.next()) {
@@ -595,7 +591,7 @@ public class Driver {
 				}
 
 				sql = "INSERT INTO CUSTOMER VALUES('" + currentCID + "', '" + salutation + "', '" + first + "', '" + last + "', '" + credit + "', TO_DATE('"
-				+ creditExpire + "','MM-dd-yyyy'), '" + street + "', '" + city  + "', '" + state + "', '" + phone + "', '" + email + "', '" + freqFlyer + "')";
+				+ creditExpire + "','MM-DD-YYYY'), '" + street + "', '" + city  + "', '" + state + "', '" + phone + "', '" + email + "', '" + freqFlyer + "')";
 				s.executeQuery(sql);
 				System.out.println("Customer was successfully added.\n");
 			}
@@ -615,7 +611,7 @@ public class Driver {
 				String cid = r.getString("CID");
 				String salutation = r.getString("Salutation");
 				String credit = r.getString("Credit_Card_Num");
-				java.util.Date creditExpire = r.getDate("Credit_Card_Expire");
+				Date creditExpire = r.getDate("Credit_Card_Expire");
 				String street = r.getString("Street");
 				String city = r.getString("City");
 				String state = r.getString("State");
@@ -786,7 +782,7 @@ public class Driver {
 			Statement s = connection.createStatement();
 			String sql = "SELECT Flight_Number, Airline_ID, Departure_City, Arrival_City, Departure_time, Arrival_Time " +
 				"FROM Flight WHERE Departure_City = '" + cityA + "' AND Arrival_City = '" + cityB + "' AND " +
-				"(capacity(Flight_Number) - reserved(Flight_Number, TO_DATE('" + date + "', 'MM-dd-yyyy'))) > 0";
+				"(capacity(Flight_Number) - reserved(Flight_Number, TO_DATE('" + date + "', 'MM-DD-YYYY'))) > 0";
 			ResultSet r = s.executeQuery(sql);
 
 			System.out.println("\nDirect Flights from " + cityA + " to " + cityB + ":");
@@ -803,8 +799,8 @@ public class Driver {
 				"AND f1.Departure_City = '" + cityA + "' " +
 				"AND f2.Arrival_City = '" + cityB + "' " +
 				"AND (TO_NUMBER(f2.Departure_Time) - TO_NUMBER(f1.Arrival_Time) > 100) " +
-				"AND (capacity(f1.Flight_Number) - reserved(f1.Flight_Number, TO_DATE('" + date + "', 'MM-dd-yyyy'))) > 0 " +
-				"AND (capacity(f2.Flight_Number) - reserved(f2.Flight_Number, TO_DATE('" + date + "', 'MM-dd-yyyy'))) > 0 " +
+				"AND (capacity(f1.Flight_Number) - reserved(f1.Flight_Number, TO_DATE('" + date + "', 'MM-DD-YYYY'))) > 0 " +
+				"AND (capacity(f2.Flight_Number) - reserved(f2.Flight_Number, TO_DATE('" + date + "', 'MM-DD-YYYY'))) > 0 " +
 				"AND ((SUBSTR(f1.Weekly_Schedule, 1, 1) = 'S' AND SUBSTR(f2.Weekly_Schedule, 1, 1) = 'S') " +
 					"OR (SUBSTR(f1.Weekly_Schedule, 2, 1) = 'M' AND SUBSTR(f2.Weekly_Schedule, 2, 1) = 'M') " +
 					"OR (SUBSTR(f1.Weekly_Schedule, 3, 1) = 'T' AND SUBSTR(f2.Weekly_Schedule, 3, 1) = 'T') " +
@@ -843,7 +839,7 @@ public class Driver {
 
 			sql = "SELECT Flight_Number, Airline_ID, Departure_City, Arrival_City, Departure_time, Arrival_Time " +
 				"FROM Flight WHERE Departure_City = '" + cityA + "' AND Arrival_City = '" + cityB + "' AND airline_id = '" + airline_id + "' " +
-				"AND (capacity(Flight_Number) - reserved(Flight_Number, TO_DATE('" + date + "', 'MM-dd-yyyy'))) > 0";
+				"AND (capacity(Flight_Number) - reserved(Flight_Number, TO_DATE('" + date + "', 'MM-DD-YYYY'))) > 0";
 			r = s.executeQuery(sql);
 
 			System.out.println("\nDirect Flights from " + cityA + " to " + cityB + ":");
@@ -863,8 +859,8 @@ public class Driver {
 				"AND f1.airline_id = '" + airline_id + "' " +
 				"AND f2.airline_id = '" + airline_id + "' " +
 				"AND (TO_NUMBER(f2.Departure_Time) - TO_NUMBER(f1.Arrival_Time) > 100) " +
-				"AND (capacity(f1.Flight_Number) - reserved(f1.Flight_Number, TO_DATE('" + date + "', 'MM-dd-yyyy'))) > 0 " +
-				"AND (capacity(f2.Flight_Number) - reserved(f2.Flight_Number, TO_DATE('" + date + "', 'MM-dd-yyyy'))) > 0" +
+				"AND (capacity(f1.Flight_Number) - reserved(f1.Flight_Number, TO_DATE('" + date + "', 'MM-DD-YYYY'))) > 0 " +
+				"AND (capacity(f2.Flight_Number) - reserved(f2.Flight_Number, TO_DATE('" + date + "', 'MM-DD-YYYY'))) > 0" +
 				"AND ((SUBSTR(f1.Weekly_Schedule, 1, 1) = 'S' AND SUBSTR(f2.Weekly_Schedule, 1, 1) = 'S') " +
 					"OR (SUBSTR(f1.Weekly_Schedule, 2, 1) = 'M' AND SUBSTR(f2.Weekly_Schedule, 2, 1) = 'M') " +
 					"OR (SUBSTR(f1.Weekly_Schedule, 3, 1) = 'T' AND SUBSTR(f2.Weekly_Schedule, 3, 1) = 'T') " +
@@ -892,9 +888,9 @@ public class Driver {
 	// Asks the user for name and populates the reservation info with the customer's information
 	// Determines high and low prices based on today's date: reservation date is today
 		try {
-			Scanner scan = new Scanner(System.in);
 			if (firstName.equals("") && lastName.equals("")) {
 				// get name
+				Scanner scan = new Scanner(System.in);
 			    System.out.println("Enter first name");
 			    firstName = scan.nextLine();
 			    System.out.println("Enter last name");
@@ -944,82 +940,10 @@ public class Driver {
 			if (credit == null) credit = "";
 			if (freq == null) freq = "";
 
-			boolean chargeHighPrice;
 			// Determine how many flights there are
 			int flightCount = 0;
 			for (int i = 0; i < flights.length; i++) {
 				if (flights[i] != null) flightCount++;
-			}
-
-			if (flightCount == 1) {
-				chargeHighPrice = false;
-			}
-			else if (flightCount == 2) {
-				System.out.println("Is your flight a one-way trip? [y/n]");
-				String oneWay = scan.nextLine();
-				if (oneWay.equals("y")) {
-					chargeHighPrice = false;
-				}
-				else if (oneWay.equals("n")) {
-					// If the two flights are on the same day, we charge the high price.
-					DateFormat df = new SimpleDateFormat("MM-dd-yyyy");
-					java.util.Date firstFlight = df.parse(dates[0]);
-					java.util.Date secondFlight = df.parse(dates[1]);
-					if (firstFlight.equals(secondFlight)) {
-						chargeHighPrice = true;
-					}
-					else {
-						chargeHighPrice = false;
-					}
-				}
-				else {
-					System.out.println("\nIncorrect command. [t] or [b] must be entered.");
-					return null;
-				}
-			}
-			else if (flightCount == 3) {
-				System.out.println("Is the flight to your destination or the way back composed of multiple legs? Enter [t] for to and [b] for way back. [t/b]");
-				String legs = scan.nextLine();
-				// If we have two legs for the way there, we must compare the first leg of the way there and the flight on the way back.
-				if (legs.equals("t")) {
-					DateFormat df = new SimpleDateFormat("MM-dd-yyyy");
-					java.util.Date firstFlight = df.parse(dates[0]);
-					java.util.Date secondFlight = df.parse(dates[2]);
-					if (firstFlight.equals(secondFlight)) {
-						chargeHighPrice = true;
-					}
-					else {
-						chargeHighPrice = false;
-					}
-				}
-				// If we have two legs for the way back, we must compare the first leg of the way back and the flight on the way there.
-				else if (legs.equals("b") ) {
-					DateFormat df = new SimpleDateFormat("MM-dd-yyyy");
-					java.util.Date firstFlight = df.parse(dates[0]);
-					java.util.Date secondFlight = df.parse(dates[1]);
-					if (firstFlight.equals(secondFlight)) {
-						chargeHighPrice = true;
-					}
-					else {
-						chargeHighPrice = false;
-					}
-				}
-				else {
-					System.out.println("\nIncorrect command. [t] or [b] must be entered.");
-					return null;
-				}
-			}
-			// If we have 4 legs total (2 there, 2 back), then we compare the dates of the first flight there and the first flight back.
-			else {
-				DateFormat df = new SimpleDateFormat("MM-dd-yyyy");
-				java.util.Date firstFlight = df.parse(dates[0]);
-				java.util.Date secondFlight = df.parse(dates[2]);
-				if (firstFlight.equals(secondFlight)) {
-					chargeHighPrice = true;
-				}
-				else {
-					chargeHighPrice = false;
-				}
 			}
 
 			// Get start and end cities for the entire Reservation
@@ -1033,7 +957,7 @@ public class Driver {
 			r.next();
 			String arrivalCity = r.getString("Arrival_City");
 
-			sql = "SELECT TO_CHAR(SYSDATE, 'MM-dd-yyyy') NOW FROM DUAL";
+			sql = "SELECT TO_CHAR(SYSDATE, 'MM-DD-YYYY') NOW FROM DUAL";
 			r = s.executeQuery(sql);
 			r.next();
 			String today = r.getString("NOW");
@@ -1050,7 +974,7 @@ public class Driver {
 				String airline = r.getString("Airline_ID");
 
 				// If same day Flight, add high price, else add low price
-				if (chargeHighPrice) {
+				if (dates[i].equals(today)) {
 					sql = "SELECT High_Price FROM Price WHERE Departure_City = '" + d_city + "' AND Arrival_City = '" + a_city + "' AND Airline_ID = '" + airline + "'";
 				}
 				else {
@@ -1081,17 +1005,17 @@ public class Driver {
 			}
 
 			// Make new reservation
-			sql = "INSERT INTO Reservation VALUES('" + reservationNumber + "', '" + cid + "', " + Integer.toString(totalPrice) + ", '" + credit + "', TO_DATE('"+ today +"', 'MM-dd-yyyy')," +
+			sql = "INSERT INTO Reservation VALUES('" + reservationNumber + "', '" + cid + "', " + Integer.toString(totalPrice) + ", '" + credit + "', TO_DATE('"+ today +"', 'MM-DD-YYYY')," +
 				"'N', '" + departureCity + "', '"+ arrivalCity + "')";
 			s.executeUpdate(sql);
 
 			// Insert flights into reservation_detail
 			for(int i = 0; i < flightCount; i++){
-				sql = "INSERT INTO Reservation_Detail VALUES('" + reservationNumber + "', '"+ flights[i] + "', TO_DATE('" + dates[i] + "', 'MM-dd-yyyy'), " + Integer.toString(i) + ")";
+				sql = "INSERT INTO Reservation_Detail VALUES('" + reservationNumber + "', '"+ flights[i] + "', TO_DATE('" + dates[i] + "', 'MM-DD-YYYY'), " + Integer.toString(i) + ")";
 				s.executeUpdate(sql);
 			}
 
-		    System.out.println("Reservation #" + reservationNumber + " confirmed");
+		    System.out.println("Reservation number " + reservationNumber + " confirmed");
 
 		    connection.commit();
 		    r.close();
@@ -1145,7 +1069,7 @@ public class Driver {
 			String cid = r.getString("CID");
 			String credit = r.getString("Credit_Card_Num");
 			int cost = r.getInt("Cost");
-			java.util.Date dt = r.getDate("Reservation_Date");
+			Date dt = r.getDate("Reservation_Date");
 			String ticket = r.getString("Ticketed");
 			String start = r.getString("Start_city");
 			String end = r.getString("End_city");
