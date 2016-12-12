@@ -556,11 +556,12 @@ public class Driver {
 			flights[1] ="139";
 			dates[0] = "11-23-2016";
 			dates[1] = "11-23-2016";
+			System.out.println("\n***Enter [y] for one-way (low price) or [n] for round-trip (high price, as both are in one day)...***\n");
 			String reservationNumber = addReservation(flights, dates, "Devansh", "Desai");
-			System.out.println("\nCost should be $336 at a high price...");
+			System.out.println("\nCost should be $336 at a high price or $237 at a low price...");
 			System.out.println("\nShowing reservation #" + reservationNumber + "...");
 			showReservation(reservationNumber);
-			System.out.println("\nEnter [y] to buy at ticket and complete the test...");
+			System.out.println("\n***Enter [y] to buy at ticket and complete the test...***");
 			buyTickets(reservationNumber);
 		}
 		catch (Exception e) {
