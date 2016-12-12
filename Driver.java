@@ -1,3 +1,10 @@
+/*
+    Devansh Desai & Kevin Zhang
+    dmd113 / kwz5
+    CS 1555 - Pitt Tours Term Project
+    11/28/2016
+*/
+
 import java.sql.*;
 import java.util.*;
 import java.io.*;

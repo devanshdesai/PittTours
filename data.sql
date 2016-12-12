@@ -1,3 +1,10 @@
+/*
+    Devansh Desai & Kevin Zhang
+    dmd113 / kwz5
+    CS 1555 - Pitt Tours Term Project
+    11/28/2016
+*/
+
 INSERT INTO Airline VALUES('00001', 'American Airlines', 'AAL', 1936);
 INSERT INTO Airline VALUES('00002', 'United Airlines', 'UAL', 1931);
 INSERT INTO Airline VALUES('00003', 'Delta Air Lines', 'DAL', 1924);
